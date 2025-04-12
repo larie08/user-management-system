@@ -14,10 +14,10 @@ export class AccountService {
     private accountSubject: BehaviorSubject<Account>;
     public account: Observable<Account>;
 
-    constructor{
+    constructor(
         private router: Router,
         private http: HttpClient
-    } {
+     ) {
         this.accountSubject = new BehaviorSubject<Account>(null);
         this.account = this.accountSubject.asObservable();
     }
@@ -30,7 +30,7 @@ export class AccountService {
         return this.http.post<Account>(`${baseUrl}/authenticate`, { email, password }, { withCredentials: true })
             .pipe(map(account => {
                this.accountSubject.next(account);
-               this.startRefreshTokenTimer(account);
+               this.startRefreshTokenTimer();
                return account;
             }));
     }
@@ -84,7 +84,7 @@ export class AccountService {
     }
 
     update(id, params) {
-        return this.http.put(`${baseUrl}/${id}`, params);
+        return this.http.put(`${baseUrl}/${id}`, params)
         .pipe(map((account: any) => {
             // update the current account if it was updated
             if (account.id === this.accountValue.id) {
@@ -100,7 +100,7 @@ export class AccountService {
         return this.http.delete(`${baseUrl}/${id}`)
             .pipe(finalize(() => {
                 // auto logout if the logged in account deleted 
-                if (id === this.accountValue.id) {
+                if (id === this.accountValue.id) 
                     this.logout();
             }));
     }
