@@ -6,14 +6,14 @@
         "password": "",
         "database": "node-mysql-signup-verification-api"
     },
-    "secret": "THIS IS USED TO SIGN AND VERIFY JWT TOKENS, REPLCE IT WITH YOUR OWN SECRET, IT CAN BE ANY STRING",
+    "secret": "z3UG88nutkGpKUbjC6yz/g==",
     "emailFrom": "info@node-mysql-signup-verification-api.com",
     "smtpOptions": {
-        "host": "[ENTER YOUR OWN SMTP OPTIONS OT CREATE A FREE TEST ACCOUNT IN ONE CLICK AT https://etherel.email/]",
+        "host": "smtp.ethereal.email",
         "port": 587,
         "auth": {
-            "user": "",
-            "pass": ""
+            "user": "scot.heathcote@ethereal.email",
+            "pass": "m39UkuK6MKF5G3vkQP"
         }
     }
 }
