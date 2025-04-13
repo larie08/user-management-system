@@ -20,14 +20,15 @@ function model(sequelize) {
         updated: { type: DataTypes.DATE },
         isVerified: { 
             type: DataTypes.VIRTUAL,
-            get() { return !!(this.verified || this.passwordReset); },
-        },
+            get() { return !!(this.verified || this.passwordReset); }
+        }
     };
 
     const options = {
         //disbale default timestamp fields (createdAt and updatedAt)
         timestamps: false,
         defaultScope: {
+            //exclude password hash by default
             attributes: { exclude: ['passwordHash'] }
         },
         scopes: {

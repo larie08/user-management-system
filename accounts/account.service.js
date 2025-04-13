@@ -1,4 +1,3 @@
-// tagsa2 ug butang per role assignment
 const config = require('config.json');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -23,8 +22,10 @@ module.exports = {
     update,
     delete: _delete,
 };
+
 // authenticate - rubi
 async function authenticate({ email, password, ipAddress }) {
+  const account = await db.Account.scope('withHash').findOne({ where: { email } });
 
     if (!account || !account.isVerified || !(await bcrypt.compare(password, account.passwordHash))) {
         throw 'Email or password is incorrect';
@@ -44,6 +45,7 @@ async function authenticate({ email, password, ipAddress }) {
         refreshToken: refreshToken.token
     };
 }
+
 // Refresh Token - de luna
 async function refreshToken({ token, ipAddress }) {
     const refreshToken = await getRefreshToken(token);
@@ -67,6 +69,7 @@ async function refreshToken({ token, ipAddress }) {
       refreshToken: newRefreshToken.token
     };
 }
+
 // Revoke Token - de luna
 async function revokeToken({ token, ipAddress }) {
   const refreshToken = await getRefreshToken(token);
@@ -76,6 +79,7 @@ async function revokeToken({ token, ipAddress }) {
   refreshToken.revokedByIp = ipAddress;
   await refreshToken.save();
 }
+
 //register - rubi
 async function register(params, origin) {
     // validate
@@ -101,6 +105,7 @@ async function register(params, origin) {
     // send email
     await sendVerificationEmail(account, origin);
 }
+
 //verify email - rubi
 async function verifyEmail({ token }) {
     const account = await db.Account.findOne({ where: { verificationToken: token } });
@@ -111,6 +116,7 @@ async function verifyEmail({ token }) {
     account.verificationToken = null;
     await account.save();
 }
+
 // Forgot Passowrd - de luna
 async function forgotPassword({ email }, origin) {
   const account = await db.Account.findOne({ where: { email } });
@@ -126,6 +132,7 @@ async function forgotPassword({ email }, origin) {
   // send email
   await sendPasswordResetEmail(account, origin);
 }
+
 //validate reset token - de luna
 async function validateResetToken({ token }) {
     const account = await db.Account.findOne({
@@ -139,6 +146,7 @@ async function validateResetToken({ token }) {
   
     return account;
   }
+
 // reset password - de luna
 async function resetPassword({ token, password }) {
     const account = await validateResetToken({ token });
@@ -149,6 +157,7 @@ async function resetPassword({ token, password }) {
     account.resetToken = null;
     await account.save();
 }
+
 //CRUD (GetAll)- de luna
 async function getAll() {
     const accounts = await db.Account.findAll();
@@ -265,6 +274,7 @@ async function sendVerificationEmail(account, origin) {
                ${message}`
     });
 }
+
 // send registered email - rubi
 async function sendAlreadyRegisteredEmail(email, origin) {
     let message;

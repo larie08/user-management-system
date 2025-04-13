@@ -23,15 +23,27 @@ router.put('/:id', authorize(), updateSchema, update);
 router.delete('/:id', authorize(), _delete);
 
 module.exports = router;
-// authenticate & authenticate shcema, register/schema, verify email/schema - rubi
 
-// refresh token, refresh token schema, revoke token schema,  forgot pass validate reset token schema, reset pass/schema- de luna
-// get all, get by id, create shcema/create, update schema, delete schema, set token cookie- de luna
-
-// authenticateSchema - rubi 
+//authenticateSchema - rubi
+function authenticateSchema(req, res, next) {
+    const schema = Joi.object({
+        email: Joi.string().required(),
+        password: Joi.string().required()
+    });
+    validateRequest(req, next, schema);
+}
 
 // authenticate - rubi
-
+function authenticate(req, res, next) {
+    const { email, password } = req.body;
+    const ipAddress = req.ip;
+    accountService.authenticate({ email, password, ipAddress })
+        .then(({ refreshToken, ...account }) => {
+            setTokenCookie(res, refreshToken); // set refresh token cookie
+            res.json(account); // return account details without the password
+        })
+        .catch(next); 
+}
 
 // refresh token - de luna
 function refreshToken(req, res, next) {
@@ -70,12 +82,40 @@ function revokeToken(req, res, next) {
 }
 
 // registerSchema - rubi
+function registerSchema(req, res, next) {
+  const schema = Joi.object({
+    title: Joi.string().required(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+    confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
+    acceptTerms: Joi.boolean().valid(true).required()
+  });
+  validateRequest(req, next, schema);
+}
 
 // register - rubi
+function register(req, res, next) {
+  accountService.register(req.body, req.get('origin'))
+    .then(() => res.json({ message: 'Registration successful, please check your email for verification instructions' }))
+    .catch(next);
+}
 
 // verify email schema - rubi
+function verifyEmailSchema(req, res, next) {
+  const schema = Joi.object({
+    token: Joi.string().required()
+  });
+  validateRequest(req, next, schema);
+}
 
 // verify email - rubi
+function verifyEmail(req, res, next) {
+  accountService.verifyEmail(req.body)
+    .then(() => res.json({ message: 'Verification successful, you can now login' }))
+    .catch(next);
+}
 
 // Forgot Password Schema - de luna
 function forgotPasswordSchema(req, res, next) {
