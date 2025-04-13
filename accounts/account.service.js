@@ -1,4 +1,3 @@
-// tagsa2 ug butang per role assignment
 const config = require('config.json');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -25,6 +24,7 @@ module.exports = {
 };
 // authenticate - rubi
 async function authenticate({ email, password, ipAddress }) {
+  const account = await db.Account.scope('withHash').findOne({ where: { email } });
 
     if (!account || !account.isVerified || !(await bcrypt.compare(password, account.passwordHash))) {
         throw 'Email or password is incorrect';
@@ -44,6 +44,7 @@ async function authenticate({ email, password, ipAddress }) {
         refreshToken: refreshToken.token
     };
 }
+
 // Refresh Token - de luna
 async function refreshToken({ token, ipAddress }) {
     const refreshToken = await getRefreshToken(token);
@@ -67,6 +68,7 @@ async function refreshToken({ token, ipAddress }) {
       refreshToken: newRefreshToken.token
     };
 }
+
 // Revoke Token - de luna
 async function revokeToken({ token, ipAddress }) {
   const refreshToken = await getRefreshToken(token);
@@ -160,7 +162,6 @@ async function getAll() {
     const accounts = await db.Account.findAll();
     return accounts.map(x => basicDetails(x));
 }
-
 // GetById - de luna  
 async function getById(id) {
     const account = await getAccount(id);
@@ -272,6 +273,7 @@ async function sendVerificationEmail(account, origin) {
                ${message}`
     });
 }
+
 // send registered email - rubi
 async function sendAlreadyRegisteredEmail(email, origin) {
     let message;
