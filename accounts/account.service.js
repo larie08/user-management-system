@@ -76,6 +76,7 @@ async function revokeToken({ token, ipAddress }) {
   refreshToken.revokedByIp = ipAddress;
   await refreshToken.save();
 }
+
 //register - rubi
 async function register(params, origin) {
     // validate
@@ -101,6 +102,7 @@ async function register(params, origin) {
     // send email
     await sendVerificationEmail(account, origin);
 }
+
 //verify email - rubi
 async function verifyEmail({ token }) {
     const account = await db.Account.findOne({ where: { verificationToken: token } });
@@ -111,6 +113,7 @@ async function verifyEmail({ token }) {
     account.verificationToken = null;
     await account.save();
 }
+
 // Forgot Passowrd - de luna
 async function forgotPassword({ email }, origin) {
   const account = await db.Account.findOne({ where: { email } });
@@ -126,6 +129,7 @@ async function forgotPassword({ email }, origin) {
   // send email
   await sendPasswordResetEmail(account, origin);
 }
+
 //validate reset token - de luna
 async function validateResetToken({ token }) {
     const account = await db.Account.findOne({
@@ -139,6 +143,7 @@ async function validateResetToken({ token }) {
   
     return account;
   }
+
 // reset password - de luna
 async function resetPassword({ token, password }) {
     const account = await validateResetToken({ token });
@@ -149,11 +154,13 @@ async function resetPassword({ token, password }) {
     account.resetToken = null;
     await account.save();
 }
+
 //CRUD (GetAll)- de luna
 async function getAll() {
     const accounts = await db.Account.findAll();
     return accounts.map(x => basicDetails(x));
 }
+
 // GetById - de luna  
 async function getById(id) {
     const account = await getAccount(id);
