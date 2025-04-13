@@ -1,5 +1,5 @@
 {
-    "name": "node-mysql-signup-verification-api",
+    "name": "mysql-signup-verification-api",
     "version": "1.0.0",
     "description": "NodeJS and MySQL API for Email Sign Up with Verification, Authentication & Forgot Password",
     "license": "MIT",
@@ -29,5 +29,16 @@
     },
     "devDependencies": {
         "nodemon": "^2.0.3"
-    }
+    },
+    "main": "server.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/larie08/user-management-system.git"
+    },
+    "keywords": [],
+    "author": "",
+    "bugs": {
+        "url": "https://github.com/larie08/user-management-system/issues"
+    },
+    "homepage": "https://github.com/larie08/user-management-system#readme"
 }
