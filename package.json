@@ -25,16 +25,5 @@
     },
     "devDependencies": {
         "nodemon": "^2.0.3"
-    },
-    "main": "server.js",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/larie08/user-management-system.git"
-    },
-    "keywords": [],
-    "author": "",
-    "bugs": {
-        "url": "https://github.com/larie08/user-management-system/issues"
-    },
-    "homepage": "https://github.com/larie08/user-management-system#readme"
+    }
 }
