@@ -1,12 +1,13 @@
-import {  Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AccountService, AlertService } from '@app/_services';
+import { MustMatch } from '@app/_helpers';
 
-@CompositionEvent({ templateUrl: 'login.component.html' })
-export class LoginComponent implements OnInit {
+@Component({ templateUrl: 'register.component.html' })
+export class RegisterComponent implements OnInit {
     form: UntypedFormGroup;
     loading = false;
     submitted = false;
@@ -21,33 +22,39 @@ export class LoginComponent implements OnInit {
 
     ngOnInit() {
         this.form = this.formBuilder.group({
+            title: ['', Validators.required],
+            firstName: ['', Validators.required],
+            lastName: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
-            password: ['', Validators.required],
+            password: ['', [Validators.required, Validators.minLength(6)]],
+            confirmPassword: ['', Validators.required],
+            acceptTerms: [false, Validators.requiredTrue]
+        }, {
+            validator: MustMatch('password', 'confirmPassword')
         });
     }
 
     // convenience getter for easy access to form fields
     get f() { return this.form.controls; }
 
-    OnSubmit() {
+    onSubmit() {
         this.submitted = true;
-
+    
         // reset alerts on submit
         this.alertService.clear();
-
+    
         // stop here if form is invalid
         if (this.form.invalid) {
             return;
         }
-
+    
         this.loading = true;
-        this.accountService.login(this.f.email.value, this.f.password.value)
+        this.accountService.register(this.form.value)
             .pipe(first())
             .subscribe({
                 next: () => {
-                    // get return url from query parameters or default to home page
-                    const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-                    this.router.navigateByUrl(returnUrl);
+                    this.alertService.success('Registration successful, please check your email for verification instructions', { keepAfterRouteChange: true });
+                    this.router.navigate(['../login'], { relativeTo: this.route });
                 },
                 error: error => {
                     this.alertService.error(error);
