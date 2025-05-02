@@ -49,7 +49,7 @@ Testing:
 Functional testing results: https://ethereal.email/messages
 Security testing results: https://ethereal.email/messages
 
-## Documentation
+## Documentation --
 
 **Developer 1: Backend Signup Authentication
 1. Overview:
@@ -125,6 +125,7 @@ Endpoint: /accounts/reset-password
 
 Example of forgot-password: 
 ![image](https://github.com/user-attachments/assets/e939b39a-ce00-4c9f-86a8-e262932e478f)
+
 
 Example of request-password: 
 ![image](https://github.com/user-attachments/assets/34015fb2-e3a8-466c-b829-acf67500cfd0)
