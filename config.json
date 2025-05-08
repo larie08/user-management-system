@@ -3,8 +3,8 @@
         "host": "localhost",
         "port": 3306,
         "user": "root",
-        "password": "larieSql_p@ss123!!",
-        "database": "node-mysql-signup-verification-api"
+        "password": "password",
+        "database": "intprog"
     },
     "secret": "z3UG88nutkGpKUbjC6yz/g==",
     "emailFrom": "info@node-mysql-signup-verification-api.com",
