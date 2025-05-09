@@ -15,13 +15,23 @@ async function initialize() {
     //connect to db
     const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
 
-    //inir models and add them to the exported db project
-    db.Account = require ('../accounts/account.model')(sequelize);
+    //init models and add them to the exported db project
+    db.Account = require('../accounts/account.model')(sequelize);
     db.RefreshToken = require('../accounts/refresh-token.model')(sequelize);
+    db.Department = require('../departments/department.model')(sequelize);
+    db.Employee = require('../employees/employee.model')(sequelize);
 
-    // define relationship
+    // define relationships
     db.Account.hasMany(db.RefreshToken, { onDelete: 'CASCADE' });
     db.RefreshToken.belongsTo(db.Account);
+
+    // Account-Employee relationship
+    db.Account.hasOne(db.Employee, { foreignKey: 'userId' });
+    db.Employee.belongsTo(db.Account, { foreignKey: 'userId' });
+
+    // Department-Employee relationship
+    db.Department.hasMany(db.Employee, { foreignKey: 'departmentId', onDelete: 'SET NULL' });
+    db.Employee.belongsTo(db.Department, { foreignKey: 'departmentId' });
 
     // sync all models with database
     await sequelize.sync({ alter: true });

@@ -14,7 +14,8 @@ const routes: Routes = [
         children: [
             { path : '', component: OverviewComponent },
             { path : 'accounts', loadChildren: accountsModule },
-
+            { path : 'departments', loadChildren: () => import('./departments/departments.module').then(x => x.DepartmentsModule) },
+            { path : 'employees', loadChildren: () => import('./employees/employees.module').then(x => x.EmployeesModule) }
         ]
     }
 ];
