@@ -8,6 +8,7 @@ router.post('/', authorize(Role.Admin), create);
 router.get('/employee/:employeeId', authorize(), getByEmployeeId);
 router.put('/:id/status', authorize(Role.Admin), updateStatus);
 router.post('/onboarding', authorize(Role.Admin), onboarding);
+router.get('/', authorize(), getAll);
 
 async function create(req, res, next) {
     try {
@@ -43,6 +44,13 @@ async function onboarding(req, res, next) {
             status: 'Pending'
         });
         res.status(201).json(workflow);
+    } catch (err) { next(err); }
+}
+
+async function getAll(req, res, next) {
+    try {
+        const workflows = await db.Workflow.findAll();
+        res.json(workflows);
     } catch (err) { next(err); }
 }
 

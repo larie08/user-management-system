@@ -1,0 +1,55 @@
+<div class="card">
+    <div class="card-header">{{id ? 'Edit' : 'Add'}} Employee</div>
+    <div class="card-body">
+        <div class="alert alert-danger" *ngIf="errorMessage">{{errorMessage}}</div>
+        <form [ngClass]="{'was-validated': loading}" #employeeForm="ngForm">
+            <div class="mb-3">
+                <label class="form-label">Employee ID</label>
+                <input type="text" class="form-control" [(ngModel)]="employee.employeeId" name="employeeId" required [disabled]="!!id">
+                <div class="invalid-feedback">Employee ID is required</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">User</label>
+                <select class="form-select" [(ngModel)]="employee.userId" name="userId" required>
+                    <option value="">Select User</option>
+                    <option *ngFor="let user of users" [value]="user.id">{{user.email}}</option>
+                </select>
+                <div class="invalid-feedback">User is required</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Position</label>
+                <input type="text" class="form-control" [(ngModel)]="employee.position" name="position" required>
+                <div class="invalid-feedback">Position is required</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Department</label>
+                <select class="form-select" [(ngModel)]="employee.departmentId" name="departmentId">
+                    <option value="">Select Department</option>
+                    <option *ngFor="let dept of departments" [value]="dept.id">{{dept.name}}</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Hire Date</label>
+                <input type="date" class="form-control" [(ngModel)]="employee.hireDate" name="hireDate" required>
+                <div class="invalid-feedback">Hire Date is required</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" [(ngModel)]="employee.status" name="status" required>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+                <div class="invalid-feedback">Status is required</div>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-primary me-2" (click)="save()" [disabled]="loading || !employeeForm.form.valid">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+                    Save
+                </button>
+                <button class="btn btn-secondary" (click)="cancel()" [disabled]="loading">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+        
+    

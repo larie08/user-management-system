@@ -43,7 +43,7 @@ async function authenticate({ email, password, ipAddress }) {
         ...basicDetails(account),
         jwtToken,
         refreshToken: refreshToken.token
-    };
+    };  
 }
 
 // Refresh Token - de luna
