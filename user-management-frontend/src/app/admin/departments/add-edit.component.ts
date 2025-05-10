@@ -10,6 +10,7 @@ export class AddEditComponent implements OnInit {
     id: string;
     department: Department;
     errorMessage: string;
+    loading = false;
 
     constructor(
         private router: Router,
@@ -21,15 +22,28 @@ export class AddEditComponent implements OnInit {
         this.id = this.route.snapshot.params['id'];
         
         if (this.id) {
+            this.loading = true;
             this.departmentService.getById(this.id)
                 .pipe(first())
-                .subscribe(department => this.department = department);
+                .subscribe({
+                    next: department => {
+                        this.department = department;
+                        this.loading = false;
+                    },
+                    error: error => {
+                        this.errorMessage = error;
+                        this.loading = false;
+                    }
+                });
         } else {
             this.department = new Department();
         }
     }
 
     save() {
+        this.loading = true;
+        this.errorMessage = '';
+
         if (this.id) {
             this.departmentService.update(this.id, this.department)
                 .pipe(first())
@@ -39,6 +53,7 @@ export class AddEditComponent implements OnInit {
                     },
                     error: error => {
                         this.errorMessage = error;
+                        this.loading = false;
                     }
                 });
         } else {
@@ -50,6 +65,7 @@ export class AddEditComponent implements OnInit {
                     },
                     error: error => {
                         this.errorMessage = error;
+                        this.loading = false;
                     }
                 });
         }
