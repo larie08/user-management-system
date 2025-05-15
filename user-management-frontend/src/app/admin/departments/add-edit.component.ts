@@ -7,8 +7,8 @@ import { DepartmentService } from '@app/_services';
 
 @Component({ templateUrl: 'add-edit.component.html' })
 export class AddEditComponent implements OnInit {
-    id: string;
-    department: Department;
+    id: number;
+    department: Department = new Department();
     errorMessage: string;
     loading = false;
 
@@ -19,11 +19,12 @@ export class AddEditComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        this.id = this.route.snapshot.params['id'];
+        const idParam = this.route.snapshot.params['id'];
+        this.id = idParam ? parseInt(idParam, 10) : null;
         
         if (this.id) {
             this.loading = true;
-            this.departmentService.getById(this.id)
+            this.departmentService.getById(this.id.toString())
                 .pipe(first())
                 .subscribe({
                     next: department => {
@@ -31,12 +32,17 @@ export class AddEditComponent implements OnInit {
                         this.loading = false;
                     },
                     error: error => {
-                        this.errorMessage = error;
+                        this.errorMessage = error?.error?.message || 'An error occurred while loading the department';
                         this.loading = false;
                     }
                 });
         } else {
-            this.department = new Department();
+            this.department = {
+                id: null,
+                name: '',
+                description: '',
+                employeeCount: 0
+            };
         }
     }
 
@@ -45,14 +51,14 @@ export class AddEditComponent implements OnInit {
         this.errorMessage = '';
 
         if (this.id) {
-            this.departmentService.update(this.id, this.department)
+            this.departmentService.update(this.id.toString(), this.department)
                 .pipe(first())
                 .subscribe({
                     next: () => {
                         this.router.navigate(['/admin/departments']);
                     },
                     error: error => {
-                        this.errorMessage = error;
+                        this.errorMessage = error?.error?.message || 'An error occurred while updating the department';
                         this.loading = false;
                     }
                 });
@@ -64,7 +70,7 @@ export class AddEditComponent implements OnInit {
                         this.router.navigate(['/admin/departments']);
                     },
                     error: error => {
-                        this.errorMessage = error;
+                        this.errorMessage = error?.error?.message || 'An error occurred while creating the department';
                         this.loading = false;
                     }
                 });
