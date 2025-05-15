@@ -22,10 +22,19 @@ export class RequestService {
     }
 
     create(request: Request) {
+        console.log('Creating request in service:', request);
+        // Ensure employeeId is a number
+        if (request.employeeId) {
+            request.employeeId = Number(request.employeeId);
+        }
         return this.http.post(`${environment.apiUrl}/requests`, request);
     }
 
     update(id: number, request: Request) {
+        // Ensure employeeId is a number
+        if (request.employeeId) {
+            request.employeeId = Number(request.employeeId);
+        }
         return this.http.put(`${environment.apiUrl}/requests/${id}`, request);
     }
 

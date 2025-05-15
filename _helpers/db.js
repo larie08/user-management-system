@@ -21,6 +21,11 @@ async function initialize() {
     db.Department = require('../departments/department.model')(sequelize);
     db.Employee = require('../employees/employee.model')(sequelize);
 
+    // Request and RequestItem models
+    const { Request, RequestItem } = require('../requests/request.model')(sequelize, db.Employee);
+    db.Request = Request;
+    db.RequestItem = RequestItem;
+
     // define relationships
     db.Account.hasMany(db.RefreshToken, { onDelete: 'CASCADE' });
     db.RefreshToken.belongsTo(db.Account);
