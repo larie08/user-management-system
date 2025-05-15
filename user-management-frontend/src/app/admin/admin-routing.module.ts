@@ -7,6 +7,7 @@ import { OverviewComponent } from './overview.component';
 
 const accountsModule = () => import('./accounts/accounts.module').then(x => x.AccountsModule);
 const requestsModule = () => import('./requests/requests.module').then(x => x.RequestsModule);
+const workflowsModule = () => import('./workflows/workflows.module').then(x => x.WorkflowsModule); // Fixed reference to workflowsModule
 
 const routes: Routes = [
     { path : '', component: SubNavComponent, outlet: 'subnav' },
@@ -17,7 +18,9 @@ const routes: Routes = [
             { path : 'accounts', loadChildren: accountsModule },
             { path : 'departments', loadChildren: () => import('./departments/departments.module').then(x => x.DepartmentsModule) },
             { path : 'employees', loadChildren: () => import('./employees/employees.module').then(x => x.EmployeesModule) },
-            { path : 'requests', loadChildren: requestsModule }
+            { path : 'requests', loadChildren: requestsModule },
+            { path : 'workflows', loadChildren: workflowsModule } // Fixed reference to workflowsModule
+
         ]
     }
 ];

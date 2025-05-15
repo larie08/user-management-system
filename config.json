@@ -4,6 +4,7 @@
         "port": 3306,
         "user": "root",
         "password": "admin1234",
+        "password": "root",
         "database": "intprog"
     },
     "secret": "z3UG88nutkGpKUbjC6yz/g==",
