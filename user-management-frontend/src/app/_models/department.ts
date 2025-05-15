@@ -1,5 +1,5 @@
 export class Department {
-    id: string;
+    id: number;
     name: string;
     description: string;
     employeeCount?: number;

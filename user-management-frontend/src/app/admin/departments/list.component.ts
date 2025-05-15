@@ -33,15 +33,15 @@ export class ListComponent implements OnInit {
         this.router.navigate(['/admin/departments/add']);
     }
 
-    edit(id: string) {
+    edit(id: number) {
         this.router.navigate(['/admin/departments/edit', id]);
     }
 
-    delete(id: string) {
+    delete(id: number) {
         const department = this.departments.find(x => x.id === id);
         if (!department) return;
         if (confirm('Are you sure you want to delete this department?')) {
-            this.departmentService.delete(id)
+            this.departmentService.delete(id.toString())
                 .pipe(first())
                 .subscribe(() => this.departments = this.departments.filter(x => x.id !== id));
         }
