@@ -356,101 +356,60 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return authorize(null, () => ok(self.departments));
         }
         
+        function getNewDepartmentId() {
+            return self.departments.length ? Math.max(...self.departments.map(d => d.id)) + 1 : 1;
+        }
+
         function createDepartment() {
-            console.log('=======================================================');
-            console.log('CREATE DEPARTMENT DEBUG - START');
-            console.log('=======================================================');
-            console.log('Create department called with body:', body);
-            
-            logAuthStatus('POST /departments');
-            
-            // Log the token parsing details
-            const authHeader = headers.get('Authorization');
-            if (authHeader && authHeader.startsWith('Bearer ')) {
-                const token = authHeader.substring(7);
-                console.log('Token being used for department creation:', token.substring(0, 20) + '...');
-                
-                try {
-                    if (token.startsWith('fake-jwt-token.')) {
-                        const payload = token.split('.')[1];
-                        const decodedPayload = JSON.parse(atob(payload));
-                        console.log('Decoded token payload:', decodedPayload);
-                        
-                        // Check token expiration
-                        const tokenExpires = new Date(decodedPayload.exp * 1000);
-                        const now = new Date();
-                        console.log('Token expires at:', tokenExpires.toISOString());
-                        console.log('Current time:', now.toISOString());
-                        console.log('Token expired:', tokenExpires < now);
-                        
-                        // Log account information
-                        const account = accounts.find(x => x.id === decodedPayload.id);
-                        if (account) {
-                            console.log('Account found from token:', {
-                                id: account.id,
-                                email: account.email,
-                                role: account.role,
-                                isActive: account.isActive
-                            });
-                            
-                            // Find matching user in self.users array
-                            console.log('Available users:', self.users);
-                            const user = self.users.find(u => u.email === account.email);
-                            if (user) {
-                                console.log('User found from account:', user);
-                                console.log('User has Admin role:', user.role === Role.Admin);
-                            } else {
-                                console.log('⚠️ ERROR: No matching user found in users array for account email:', account.email);
-                                console.log('This may be why authorization is failing!');
-                                
-                                // Fix: Add the user on-the-fly if missing
-                                self.users.push({
-                                    id: account.id,
-                                    email: account.email,
-                                    password: 'password', // Default password
-                                    role: account.role,
-                                    employeeId: account.id
-                                });
-                                console.log('🔧 Created missing user for account:', account.email);
-                            }
-                        } else {
-                            console.log('⚠️ ERROR: No account found for token ID:', decodedPayload.id);
-                            console.log('Available accounts:', accounts.map(a => ({id: a.id, email: a.email, role: a.role})));
-                        }
-                    } else {
-                        console.log('⚠️ ERROR: Token does not start with "fake-jwt-token."');
-                    }
-                } catch (e) {
-                    console.error('⚠️ ERROR: Error processing token:', e);
-                }
-            } else {
-                console.log('⚠️ ERROR: Invalid Authorization header format');
-            }
-            
-            console.log('Trying to authorize with Admin role...');
             return authorize(Role.Admin, () => {
-                console.log('✅ Authorization successful! Creating department...');
-                const department = { id: self.departments.length + 1, ...body, employeeCount: 0 };
+                console.log('Creating department with body:', body);
+                
+                // Get new ID
+                const newId = self.departments.length ? Math.max(...self.departments.map(d => d.id)) + 1 : 1;
+                
+                // Create new department object with all required fields
+                const department = {
+                    id: newId,
+                    name: body.name || '',
+                    description: body.description || '',
+                    employeeCount: 0
+                };
+                
+                // Add to departments array
                 self.departments.push(department);
+                
                 console.log('Department created successfully:', department);
-                console.log('=======================================================');
-                console.log('CREATE DEPARTMENT DEBUG - END');
-                console.log('=======================================================');
                 return ok(department);
             });
         }
         
         function updateDepartment() {
             return authorize(Role.Admin, () => {
+                console.log('Updating department with body:', body);
                 const id = parseInt(url.split('/').pop()!);
                 const deptIndex = self.departments.findIndex(d => d.id === id);
-                if (deptIndex === -1) return error('Department not found');
-                self.departments[deptIndex] = { 
-                    id, 
-                    ...body, 
-                    employeeCount: self.departments[deptIndex].employeeCount 
+                
+                if (deptIndex === -1) {
+                    console.error('Department not found with ID:', id);
+                    return error('Department not found');
+                }
+                
+                // Preserve the existing employeeCount if not provided in the update
+                const currentEmployeeCount = self.departments[deptIndex].employeeCount;
+                
+                // Create updated department object
+                const updatedDepartment = {
+                    id: id,
+                    name: body.name,
+                    description: body.description,
+                    employeeCount: body.employeeCount !== undefined ? body.employeeCount : currentEmployeeCount
                 };
-                return ok(self.departments[deptIndex]);
+                
+                // Update the department in the array
+                self.departments[deptIndex] = updatedDepartment;
+                
+                console.log('Department updated successfully:', updatedDepartment);
+                return ok(updatedDepartment);
             });
         }
         
@@ -1124,10 +1083,19 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         }
 
         function getDepartmentById() {
+            console.log('FAKE BACKEND - Getting department by ID');
             return authorize(null, () => {
                 const id = parseInt(url.split('/').pop()!);
+                console.log('FAKE BACKEND - Looking for department with ID:', id);
+                console.log('FAKE BACKEND - Available departments:', self.departments);
+                
                 const department = self.departments.find(d => d.id === id);
-                if (!department) return error('Department not found');
+                if (!department) {
+                    console.log('FAKE BACKEND - Department not found for ID:', id);
+                    return error('Department not found');
+                }
+                
+                console.log('FAKE BACKEND - Found department:', department);
                 return ok(department);
             });
         }

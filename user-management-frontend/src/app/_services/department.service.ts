@@ -16,11 +16,11 @@ export class DepartmentService {
     }
 
     create(department: Department) {
-        return this.http.post(`${environment.apiUrl}/departments`, department);
+        return this.http.post<Department>(`${environment.apiUrl}/departments`, department);
     }
 
     update(id: string, department: Department) {
-        return this.http.put(`${environment.apiUrl}/departments/${id}`, department);
+        return this.http.put<Department>(`${environment.apiUrl}/departments/${id}`, department);
     }
 
     delete(id: string) {
