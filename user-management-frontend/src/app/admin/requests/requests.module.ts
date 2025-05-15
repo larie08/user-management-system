@@ -1,23 +1,17 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 import { ListComponent } from './list.component';
 import { AddEditComponent } from './add-edit.component';
-
-const routes: Routes = [
-    { path: '', component: ListComponent },
-    { path: 'add', component: AddEditComponent },
-    { path: 'edit/:id', component: AddEditComponent },
-    { path: ':employeeId', component: ListComponent }
-];
+import { RequestsRoutingModule } from './requests-routing.module';
 
 @NgModule({
     imports: [
         CommonModule,
-        ReactiveFormsModule,
-        RouterModule.forChild(routes)
+        FormsModule,
+        RequestsRoutingModule
     ],
     declarations: [
         ListComponent,

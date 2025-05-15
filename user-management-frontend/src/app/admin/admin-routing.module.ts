@@ -6,6 +6,7 @@ import { LayoutComponent } from './layout.component';
 import { OverviewComponent } from './overview.component';
 
 const accountsModule = () => import('./accounts/accounts.module').then(x => x.AccountsModule);
+const requestsModule = () => import('./requests/requests.module').then(x => x.RequestsModule);
 
 const routes: Routes = [
     { path : '', component: SubNavComponent, outlet: 'subnav' },
@@ -15,7 +16,8 @@ const routes: Routes = [
             { path : '', component: OverviewComponent },
             { path : 'accounts', loadChildren: accountsModule },
             { path : 'departments', loadChildren: () => import('./departments/departments.module').then(x => x.DepartmentsModule) },
-            { path : 'employees', loadChildren: () => import('./employees/employees.module').then(x => x.EmployeesModule) }
+            { path : 'employees', loadChildren: () => import('./employees/employees.module').then(x => x.EmployeesModule) },
+            { path : 'requests', loadChildren: requestsModule }
         ]
     }
 ];
