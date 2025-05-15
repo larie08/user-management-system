@@ -16,9 +16,14 @@ router.delete('/:id', authorize(Role.Admin), _delete);
 
 async function create(req, res, next) {
     try {
+        let employeeId = req.user.employeeId;
+        // If admin, allow employeeId from body
+        if (req.user.role === 'Admin' && req.body.employeeId) {
+            employeeId = req.body.employeeId;
+        }
         const request = await db.Request.create({
             ...req.body,
-            employeeId: req.user.employeeId,
+            employeeId,
             requestNumber: await generateRequestNumber()
         }, {
             include: [{ model: db.RequestItem, as: 'items' }]
@@ -30,7 +35,10 @@ async function create(req, res, next) {
 async function getAll(req, res, next) {
     try {
         const requests = await db.Request.findAll({
-            include: [{ model: db.RequestItem, as: 'items' }, { model: db.Employee, as: 'employee' }]
+            include: [
+                { model: db.RequestItem, as: 'items' },
+                { model: db.Employee, as: 'employee', include: [{ model: db.Account, as: 'account' }] }
+            ]
         });
         res.json(requests);
     } catch (err) { next(err); }
@@ -53,7 +61,10 @@ async function getByEmployeeId(req, res, next) {
     try {
         const requests = await db.Request.findAll({
             where: { employeeId: req.params.employeeId },
-            include: [{ model: db.RequestItem, as: 'items' }]
+            include: [
+                { model: db.RequestItem, as: 'items' },
+                { model: db.Employee, as: 'employee', include: [{ model: db.Account, as: 'account' }] }
+            ]
         });
         res.json(requests);
     } catch (err) { next(err); }
