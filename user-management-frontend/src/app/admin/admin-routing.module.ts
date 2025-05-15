@@ -7,7 +7,7 @@ import { OverviewComponent } from './overview.component';
 
 const accountsModule = () => import('./accounts/accounts.module').then(x => x.AccountsModule);
 const requestsModule = () => import('./requests/requests.module').then(x => x.RequestsModule);
-const workflowsModule = () => import('./workflows/workflows.module').then(x => x.WorkflowsModule); // Added definition for workflowsModule
+const workflowsModule = () => import('./workflows/workflows.module').then(x => x.WorkflowsModule); // Fixed reference to workflowsModule
 
 const routes: Routes = [
     { path : '', component: SubNavComponent, outlet: 'subnav' },
