@@ -1,5 +1,6 @@
+<!-- Request List Component - Enhanced UI Version -->
 <div class="card wider-card">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="card-header">
         <span>Employee Requests</span>
         <div>
             <button class="btn btn-primary" (click)="add()">Add Request</button>
@@ -33,10 +34,10 @@
                         <td>{{request.type}}</td>
                         <td>
                             <ng-container *ngIf="request.items && request.items.length > 0">
-                                <span>
+                                <span class="item-summary">
                                     {{ getItemsSummary(request) }}
                                 </span>
-                                <div style="color: #888; font-size: 0.95em;">
+                                <div class="item-count">
                                     {{ request.items.length }} Item{{ request.items.length > 1 ? 's' : '' }}
                                 </div>
                             </ng-container>
@@ -45,7 +46,7 @@
                         <td>{{request.status}}</td>
                         <td>{{request.createdDate | date:'short'}}</td>
                         <td>
-                            <div class="action-buttons" style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start;">
+                            <div class="action-buttons">
                                 <button *ngIf="account?.role === 'Admin'" class="btn btn-sm btn-primary me-1" (click)="edit(request.id)">Edit</button>
                                 <select
                                     class="form-select form-select-sm me-1 status-select"
@@ -66,28 +67,191 @@
 
 <app-add-edit *ngIf="showModal" [id]="selectedId" [employeeId]="selectedEmployeeId" (close)="closeModal()"></app-add-edit>
 
+<!-- Enhanced Styles -->
 <style>
-.status-select {
-  background: #ffc107 !important;
-  color: #234 !important;
-  border: none !important;
-  border-radius: 6px !important;
-  font-weight: 500;
-  padding: 0.25rem 0.75rem;
-  height: 32px;
-  min-width: 100px;
-  width: auto;
-  display: inline-block;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.status-select:focus {
-  background: #ffcd39 !important;
-}
+/* Card Styles */
 .wider-card {
-  max-width: 1200px;
-  margin: 2rem auto;
+    max-width: 1200px;
+    margin: 2rem auto;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    background: #fff;
+    border: none;
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    background: #f7fafd;
+    border-bottom: 1px solid #e5e5e5;
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header span {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #234;
+}
+
+.card-body {
+    padding: 1.5rem;
+    background: #fafdff;
+}
+
+/* Table Styles */
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background: #f7fafd;
+    color: #345;
+    font-weight: 600;
+    padding: 1rem;
+    border-bottom: 2px solid #e5e5e5;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #e5e5e5;
+    color: #234;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #fafdff;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 6px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-primary {
+    background: #1976d2;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #1565c0;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #d32f2f;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Status Select Styles */
+.status-select {
+    background: #ffc107;
+    color: #234;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 0.4rem 0.75rem;
+    height: 32px;
+    min-width: 120px;
+    width: auto;
+    display: inline-block;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 0.875rem;
+}
+
+.status-select:focus {
+    background: #ffcd39;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+}
+
+.status-select option {
+    background: #fff;
+    color: #234;
+    padding: 8px;
+}
+
+/* Action Buttons Container */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+/* Utils */
+.me-1 {
+    margin-right: 0.25rem;
+}
+
+/* Item Summary Styles */
+.item-summary {
+    color: #234;
+    font-size: 0.95rem;
+}
+
+.item-count {
+    color: #888;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .wider-card {
+        margin: 1rem;
+    }
+    
+    .table thead {
+        display: none;
+    }
+    
+    .table, .table tbody, .table tr, .table td {
+        display: block;
+        width: 100%;
+    }
+    
+    .table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .table td {
+        padding: 0.5rem 0;
+        border: none;
+    }
+    
+    .table td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        display: inline-block;
+        width: 120px;
+    }
+    
+    .action-buttons {
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+    }
 }
 </style>
