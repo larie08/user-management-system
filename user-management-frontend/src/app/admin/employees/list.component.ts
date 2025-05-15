@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { first } from 'rxjs/operators';
 
-import { Employee } from '@app/_models';
-import { EmployeeService, AccountService } from '@app/_services';
+import { Employee, Department } from '@app/_models';
+import { EmployeeService, AccountService, DepartmentService } from '@app/_services';
 
 @Component({
     selector: 'app-employees-list',
@@ -11,16 +11,25 @@ import { EmployeeService, AccountService } from '@app/_services';
 })
 export class ListComponent implements OnInit {
     employees: Employee[] = [];
+    departments: Department[] = [];
     account = this.accountService.accountValue;
 
     constructor(
         private router: Router,
         private employeeService: EmployeeService,
-        private accountService: AccountService
+        private accountService: AccountService,
+        private departmentService: DepartmentService
     ) { }
 
     ngOnInit() {
+        this.loadDepartments();
         this.loadEmployees();
+    }
+
+    loadDepartments() {
+        this.departmentService.getAll()
+            .pipe(first())
+            .subscribe(departments => this.departments = departments);
     }
 
     loadEmployees() {
@@ -35,6 +44,16 @@ export class ListComponent implements OnInit {
                     console.error('Error loading employees:', error);
                 }
             });
+    }
+
+    getDepartmentName(employee: Employee): string {
+        // Prefer department object if present (fake backend)
+        if (employee.department && employee.department.name) {
+            return employee.department.name;
+        }
+        // Otherwise, look up by departmentId (real backend)
+        const dept = this.departments.find(d => d.id === employee.departmentId);
+        return dept ? dept.name : '';
     }
 
     add() {
