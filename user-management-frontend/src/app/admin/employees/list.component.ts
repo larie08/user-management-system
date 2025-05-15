@@ -63,6 +63,10 @@ export class ListComponent implements OnInit {
     edit(id: string) {
         this.router.navigate(['/admin/employees/edit', id]);
     }
+    
+    transfer(id: string) {
+        this.router.navigate(['/admin/employees/transfer', id]);
+    }
 
     delete(id: string) {
         const employee = this.employees.find(x => x.id === id);
@@ -73,4 +77,4 @@ export class ListComponent implements OnInit {
                 .subscribe(() => this.employees = this.employees.filter(x => x.id !== id));
         }
     }
-} 
+}

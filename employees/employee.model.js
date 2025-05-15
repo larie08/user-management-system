@@ -43,5 +43,21 @@ module.exports = (sequelize) => {
         }
     });
 
+    // Add model methods
+    Employee.transfer = async function(id, departmentId) {
+        const employee = await Employee.findByPk(id);
+        
+        // Validate
+        if (!employee) throw 'Employee not found';
+        
+        // Update department
+        employee.departmentId = departmentId;
+        
+        // Save
+        await employee.save();
+        
+        return employee;
+    };
+
     return Employee;
-}; 
+};
