@@ -1,0 +1,95 @@
+<div class="card wider-card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>Employee Requests</span>
+        <div>
+            <button style="margin-right: 20px;" class="btn btn-secondary" (click)="viewAll()">View All Requests</button>
+            <button class="btn btn-primary" (click)="add()">Add Request</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Employee</th>
+                        <th>Type</th>
+                        <th>Items</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let request of requests">
+                        <td>{{request.id}}</td>
+                        <td>
+                            <ng-container *ngIf="request.employee">
+                                <span *ngIf="request.employee.account?.email">{{request.employee.account.email}}</span>
+                                <span *ngIf="!request.employee.account?.email && request.employee.employeeId">ID: {{request.employee.employeeId}}</span>
+                                <span *ngIf="!request.employee.account?.email && !request.employee.employeeId">Unknown</span>
+                            </ng-container>
+                            <span *ngIf="!request.employee">Unknown</span>
+                        </td>
+                        <td>{{request.type}}</td>
+                        <td>
+                            <ng-container *ngIf="request.items && request.items.length > 0">
+                                <span>
+                                    {{ getItemsSummary(request) }}
+                                </span>
+                                <div style="color: #888; font-size: 0.95em;">
+                                    {{ request.items.length }} Item{{ request.items.length > 1 ? 's' : '' }}
+                                </div>
+                            </ng-container>
+                            <span *ngIf="!request.items || request.items.length === 0">No items</span>
+                        </td>
+                        <td>{{request.status}}</td>
+                        <td>{{request.createdDate | date:'short'}}</td>
+                        <td>
+                            <div class="action-buttons" style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start;">
+                                <button class="btn btn-sm btn-info me-1" (click)="view(request.id)">View</button>
+                                <button *ngIf="account?.role === 'Admin'" class="btn btn-sm btn-primary me-1" (click)="edit(request.id)">Edit</button>
+                                <select
+                                    class="form-select form-select-sm me-1 status-select"
+                                    (change)="status(request.id, $event.target.value)">
+                                    <option value="" disabled selected>Status</option>
+                                    <option value="Approved">Approve</option>
+                                    <option value="Rejected">Reject</option>
+                                </select>
+                                <button *ngIf="account?.role === 'Admin'" class="btn btn-sm btn-danger" (click)="delete(request.id)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<app-add-edit *ngIf="showModal" [id]="selectedId" [employeeId]="selectedEmployeeId" (close)="closeModal()"></app-add-edit>
+
+<style>
+.status-select {
+  background: #ffc107 !important;
+  color: #234 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  height: 32px;
+  min-width: 100px;
+  width: auto;
+  display: inline-block;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.status-select:focus {
+  background: #ffcd39 !important;
+}
+.wider-card {
+  max-width: 1200px;
+  margin: 2rem auto;
+}
+</style>

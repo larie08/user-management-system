@@ -1,0 +1,175 @@
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{id ? 'Edit' : 'Add'}} Employee</h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger" *ngIf="errorMessage">{{errorMessage}}</div>
+        <form [ngClass]="{'was-validated': loading}" #employeeForm="ngForm" class="needs-validation">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Employee ID</label>
+                    <input type="text" class="form-control form-control-lg" 
+                           [(ngModel)]="employee.employeeId" 
+                           name="employeeId" 
+                           required 
+                           [disabled]="!!id"
+                           placeholder="Enter Employee ID">
+                    <div class="invalid-feedback">Employee ID is required</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">User</label>
+                    <div class="dropdown-wrapper">
+                        <select class="form-select form-select-lg custom-select" 
+                                [(ngModel)]="employee.userId" 
+                                name="userId" 
+                                required>
+                            <option value="" disabled selected class="placeholder-option">Select User</option>
+                            <option *ngFor="let user of users" [value]="user.id" class="dropdown-option">
+                                {{user.email}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">User is required</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Position</label>
+                    <input type="text" class="form-control form-control-lg" 
+                           [(ngModel)]="employee.position" 
+                           name="position" 
+                           required
+                           placeholder="Enter Position">
+                    <div class="invalid-feedback">Position is required</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Department</label>
+                    <div class="dropdown-wrapper">
+                        <select class="form-select form-select-lg custom-select" 
+                                [(ngModel)]="employee.departmentId" 
+                                name="departmentId">
+                            <option value="" disabled selected class="placeholder-option">Select Department</option>
+                            <option *ngFor="let dept of departments" [value]="dept.id" class="dropdown-option">
+                                {{dept.name}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Hire Date</label>
+                    <input type="date" class="form-control form-control-lg" 
+                           [(ngModel)]="employee.hireDate" 
+                           name="hireDate" 
+                           required>
+                    <div class="invalid-feedback">Hire Date is required</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Status</label>
+                    <div class="dropdown-wrapper">
+                        <select class="form-select form-select-lg custom-select" 
+                                [(ngModel)]="employee.status" 
+                                name="status" 
+                                required>
+                            <option value="" disabled selected class="placeholder-option">Select Status</option>
+                            <option value="Active" class="dropdown-option status-active">Active</option>
+                            <option value="Inactive" class="dropdown-option status-inactive">Inactive</option>
+                        </select>
+                        <div class="invalid-feedback">Status is required</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button class="btn btn-secondary btn-lg px-4" 
+                        (click)="cancel()" 
+                        [disabled]="loading">
+                    Cancel
+                </button>
+                <button class="btn btn-primary btn-lg px-4" 
+                        (click)="save()" 
+                        [disabled]="loading || !employeeForm.form.valid">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.dropdown-wrapper {
+    position: relative;
+}
+
+.custom-select {
+    appearance: none;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.custom-select:hover {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.custom-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    outline: 0;
+}
+
+.placeholder-option {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.dropdown-option {
+    color: #212529;
+    padding: 8px 12px;
+}
+
+.status-active {
+    color: #198754;
+    font-weight: 500;
+}
+
+.status-inactive {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* Custom dropdown arrow */
+.dropdown-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #6c757d;
+    pointer-events: none;
+}
+
+/* Hover effect for options */
+.dropdown-option:hover {
+    background-color: #f8f9fa;
+}
+
+/* Focus styles */
+.custom-select:focus + .dropdown-wrapper::after {
+    border-top-color: #0d6efd;
+}
+</style>
+        
+    

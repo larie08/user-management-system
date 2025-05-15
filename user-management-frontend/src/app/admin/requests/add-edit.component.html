@@ -1,0 +1,41 @@
+<div class="modal" [class.show]="true" style="display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1050;">
+    <div class="modal-dialog" style="max-width: 540px; width: 100%; margin: 0;">
+        <div class="modal-content" style="border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); background: #fff;">
+            <div class="modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e5e5; background: #f7fafd; border-radius: 14px 14px 0 0;">
+                <h4 class="modal-title" style="font-size: 1.35rem; font-weight: 700; color: #234; margin: 0;">{{id ? 'Edit' : 'Add'}} Request</h4>
+                <button type="button" (click)="cancel()" style="background: none; border: none; font-size: 1.5rem; color: #888; cursor: pointer; margin-left: 1rem;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 2rem 1.5rem 1.5rem 1.5rem; background: #fafdff; border-radius: 0 0 14px 14px;">
+                <div *ngIf="errorMessage" class="alert alert-danger" style="margin-bottom: 1.25rem; border-radius: 6px;">{{errorMessage}}</div>
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label style="font-weight: 500; color: #345;">Type</label>
+                        <select [(ngModel)]="request.type" style="padding: 0.6rem; border-radius: 6px; border: 1px solid #ccd; font-size: 1rem;">
+                            <option value="">Select type</option>
+                            <option>Equipment</option>
+                            <option>Leave</option>
+                            <option>Resources</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label style="font-weight: 500; color: #345;">Items</label>
+                        <div *ngFor="let item of request.items; let i = index" style="display: flex; gap: 0.5rem; align-items: flex-end; margin-bottom: 0.5rem;">
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.25rem;">
+                                <input type="text" placeholder="Name" [(ngModel)]="item.name" style="padding: 0.5rem; border-radius: 6px; border: 1px solid #ccd; font-size: 1rem;" />
+                            </div>
+                            <div style="width: 100px; display: flex; flex-direction: column; gap: 0.25rem;">
+                                <input type="number" min="1" placeholder="Qty" [(ngModel)]="item.quantity" style="padding: 0.5rem; border-radius: 6px; border: 1px solid #ccd; font-size: 1rem;" />
+                            </div>
+                            <button (click)="removeItem(i)" style="background: #f44336; color: #fff; border: none; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 1rem; cursor: pointer;">&times;</button>
+                        </div>
+                        <button (click)="addItem()" style="align-self: flex-start; background: #e3e8ef; color: #234; border: none; border-radius: 6px; padding: 0.5rem 1.25rem; font-weight: 500; font-size: 1rem; margin-top: 0.25rem; cursor: pointer;">Add Item</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 1.25rem 1.5rem; border-top: 1px solid #e5e5e5; background: #f7fafd; border-radius: 0 0 14px 14px; display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <button (click)="cancel()" style="background: #e3e8ef; color: #234; border: none; border-radius: 6px; padding: 0.6rem 1.5rem; font-weight: 500; font-size: 1rem; cursor: pointer;">Cancel</button>
+                <button (click)="save()" style="background: #1976d2; color: #fff; border: none; border-radius: 6px; padding: 0.6rem 1.5rem; font-weight: 500; font-size: 1rem; cursor: pointer;">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -3,8 +3,8 @@
         "host": "localhost",
         "port": 3306,
         "user": "root",
-        "password": "larieSql_p@ss123!!",
-        "database": "node-mysql-signup-verification-api"
+        "password": "root",
+        "database": "password"
     },
     "secret": "z3UG88nutkGpKUbjC6yz/g==",
     "emailFrom": "info@node-mysql-signup-verification-api.com",
@@ -12,8 +12,8 @@
         "host": "smtp.ethereal.email",
         "port": 587,
         "auth": {
-            "user": "scot.heathcote@ethereal.email",
-            "pass": "m39UkuK6MKF5G3vkQP"
+            "user": "florence.torp@ethereal.email",
+            "pass": "jsTHxPc1pDcR2utG5k"
         }
     }
 }

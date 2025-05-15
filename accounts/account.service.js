@@ -43,7 +43,7 @@ async function authenticate({ email, password, ipAddress }) {
         ...basicDetails(account),
         jwtToken,
         refreshToken: refreshToken.token
-    };
+    };  
 }
 
 // Refresh Token - de luna
@@ -226,7 +226,7 @@ async function getRefreshToken(token) {
   if (!refreshToken || !refreshToken.isActive) throw 'Invalid token';
   return refreshToken;
 }
-// hash password - de luna
+// hash password - de luna-
 async function hash(password) {
   return await bcrypt.hash(password, 10);
 }
