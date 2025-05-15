@@ -10,7 +10,8 @@ router.get('/', authorize(), getAll);
 router.get('/:id', authorize(), getById);
 router.put('/:id', authorize(Role.Admin), update);
 router.delete('/:id', authorize(Role.Admin), _delete);
-router.post('/id/transfer', authorize(Role.Admin), transfer);
+// Add this new route handler for transferring employees
+router.post('/:id/transfer', authorize(), transferEmployee);
 
 async function create(req, res, next) {
     try {
@@ -74,6 +75,25 @@ async function transfer(req, res, next) {
         });
         res.json({ message: 'Employee transferred' });
     } catch (err) { next(err); }
+}
+
+function transferEmployee(req, res, next) {
+    // Get the employee ID from the URL
+    const id = parseInt(req.params.id);
+    
+    // Get the new department ID from the request body
+    const { departmentId } = req.body;
+    
+    if (!departmentId) {
+        return res.status(400).json({ message: 'Department ID is required' });
+    }
+
+    db.Employee.transfer(id, parseInt(departmentId))
+        .then(() => res.json({ message: 'Employee transferred successfully' }))
+        .catch(err => {
+            console.error('Transfer error:', err);
+            next(err);
+        });
 }
 
 module.exports = router;
