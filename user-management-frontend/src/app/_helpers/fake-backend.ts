@@ -1,4 +1,7 @@
-// Calderon, Marianne Mae
+// Author: Calderon, Marianne Mae
+// Description: This file implements a fake backend interceptor for development and testing purposes
+// It simulates API endpoints and handles authentication, user management, and HR-related operations
+
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpResponse, HttpHandler, HttpEvent, HttpInterceptor, HTTP_INTERCEPTORS, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
@@ -7,25 +10,25 @@ import { delay, materialize, dematerialize, mergeMap } from 'rxjs/operators';
 import { AlertService } from '@app/_services';
 import { Role } from '@app/_models';
 
-// array in local storage for accounts
+// Constants for local storage
 const accountsKey = 'angular-10-signup-verification-boilerplate-accounts';
 
-// Get accounts from local storage
+// Initialize accounts from local storage with default empty array if none exists
 let accounts = JSON.parse(localStorage.getItem(accountsKey)) || [];
 
-// Make sure all accounts have the required fields
+// Normalize account data to ensure all required fields exist
 accounts = accounts.map(account => {
-    // Default to active if not specified
+    // Set default active status if not specified
     if (account.isActive === undefined) {
         account.isActive = true;
     }
     
-    // Ensure admin accounts are always active
+    // Admin accounts are always active by default
     if (account.role === Role.Admin) {
         account.isActive = true;
     }
     
-    // Ensure refreshTokens array exists
+    // Initialize refresh tokens array if it doesn't exist
     if (!account.refreshTokens) {
         account.refreshTokens = [];
     }
@@ -33,31 +36,36 @@ accounts = accounts.map(account => {
     return account;
 });
 
-// Save the updated accounts back to localStorage
+// Persist normalized accounts back to localStorage
 localStorage.setItem(accountsKey, JSON.stringify(accounts));
 
 @Injectable()
 export class FakeBackendInterceptor implements HttpInterceptor {
+    // Mock data arrays for simulating database records
     private users = [
         { id: 1, email: 'admin@example.com', password: 'admin', role: Role.Admin, employeeId: 1 },
         { id: 2, email: 'user@example.com', password: 'user', role: Role.User, employeeId: 2 }
     ];
 
     private employees = [
+        // Sample employee records with basic information
         { id: 1, employeeId: 'EMP001', userId: 1, position: 'Developer', departmentId: 1, hireDate: '2025-01-01', status: 'Active' },
         { id: 2, employeeId: 'EMP002', userId: 2, position: 'Designer', departmentId: 2, hireDate: '2025-02-01', status: 'Active' }
     ];
 
     private departments = [
+        // Department records with employee counts
         { id: 1, name: 'Engineering', description: 'Software development team', employeeCount: 1 },
         { id: 2, name: 'Marketing', description: 'Marketing team', employeeCount: 1 }
     ];
 
     private workflows = [
+        // Sample workflow records for employee onboarding
         { id: 1, employeeId: 1, type: 'Onboarding', details: { task: 'Setup workstation' }, status: 'Pending' }
     ];
 
     private requests = [
+        // Equipment request records
         { id: 1, employeeId: 2, type: 'Equipment', requestItems: [{ name: 'Laptop', quantity: 1 }], status: 'Pending' }
     ];
 
