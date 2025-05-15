@@ -2,7 +2,6 @@
     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
         <span>Employee Requests</span>
         <div>
-            <button style="margin-right: 20px;" class="btn btn-secondary" (click)="viewAll()">View All Requests</button>
             <button class="btn btn-primary" (click)="add()">Add Request</button>
         </div>
     </div>
@@ -47,7 +46,6 @@
                         <td>{{request.createdDate | date:'short'}}</td>
                         <td>
                             <div class="action-buttons" style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start;">
-                                <button class="btn btn-sm btn-info me-1" (click)="view(request.id)">View</button>
                                 <button *ngIf="account?.role === 'Admin'" class="btn btn-sm btn-primary me-1" (click)="edit(request.id)">Edit</button>
                                 <select
                                     class="form-select form-select-sm me-1 status-select"

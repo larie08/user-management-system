@@ -74,10 +74,6 @@ export class ListComponent implements OnInit {
         }
     }
 
-    viewAll() {
-        this.loadRequests();
-    }
-
     add() {
         this.selectedId = null;
         this.showModal = true;
@@ -126,11 +122,6 @@ export class ListComponent implements OnInit {
     getItemsSummary(request: any): string {
         if (!request.items || request.items.length === 0) return '';
         return request.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ');
-    }
-
-    view(id: number) {
-        // TODO: Implement view logic (e.g., open a modal or navigate to a detail page)
-        console.log('View request', id);
     }
 
     status(id: number, newStatus: string) {
