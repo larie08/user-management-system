@@ -1,0 +1,118 @@
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Workflows for Employee {{employeeId}}</h5>
+    </div>
+    <div class="card-body">
+        <div *ngIf="errorMessage" class="alert alert-danger">{{errorMessage}}</div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th class="col-2">Type</th>
+                        <th class="col-4">Details</th>
+                        <th class="col-2">Created Date</th>
+                        <th class="col-2">Status</th>
+                        <th *ngIf="account?.role === 'Admin'" class="col-2 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let workflow of workflows">
+                        <td class="align-middle">{{workflow.type}}</td>
+                        <td class="align-middle">
+                            <div *ngIf="isObject(workflow.details)">
+                                <div *ngFor="let key of getObjectKeys(workflow.details)">
+                                    <strong>{{key}}:</strong> {{workflow.details[key]}}
+                                </div>
+                            </div>
+                            <div *ngIf="!isObject(workflow.details)">
+                                {{workflow.details}}
+                            </div>
+                        </td>
+                        <td class="align-middle">{{workflow.createdDate | date:'shortDate'}}</td>
+                        <td class="align-middle">
+                            <span class="badge" 
+                                  [ngClass]="{
+                                    'bg-warning': workflow.status === 'Pending',
+                                    'bg-success': workflow.status === 'Approved',
+                                    'bg-danger': workflow.status === 'Rejected'
+                                  }">
+                                {{workflow.status}}
+                            </span>
+                        </td>
+                        <td *ngIf="account?.role === 'Admin'" class="align-middle text-center">
+                            <div class="action-buttons">
+                                <select class="form-select form-select-sm d-inline-block w-auto me-2" 
+                                        [(ngModel)]="workflow.status" 
+                                        (change)="updateWorkflowStatus(workflow)">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                                <button class="btn btn-sm btn-danger" (click)="deleteWorkflow(workflow.id)" title="Delete Workflow">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngIf="workflows.length === 0">
+                        <td [colSpan]="account?.role === 'Admin' ? 5 : 4" class="text-center py-3">No workflows found for this employee</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-secondary mt-3" (click)="goBackToEmployees()">Back to Employees</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0,0,0,.02);
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal styles to ensure proper display */
+.modal.show {
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-select {
+        width: 100% !important;
+        margin-right: 0 !important;
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
