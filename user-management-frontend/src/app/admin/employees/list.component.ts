@@ -38,7 +38,7 @@ export class ListComponent implements OnInit {
             .subscribe({
                 next: (employees) => {
                     console.log('Received employees:', employees);
-                    this.employees = employees;
+                    this.employees = employees.filter(e => e.status === 'Active');
                 },
                 error: (error) => {
                     console.error('Error loading employees:', error);

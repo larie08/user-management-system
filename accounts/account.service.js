@@ -177,6 +177,7 @@ async function create(params) {
   
     const account = new db.Account(params);
     account.verified = Date.now();
+    account.status = params.status || 'Active';
   
     // hash password
     account.passwordHash = await hash(params.password);
@@ -202,6 +203,14 @@ async function update(id, params) {
 
   // copy params to account and save
   Object.assign(account, params);
+  if (params.status) {
+    account.status = params.status;
+    // Sync employee status with account status
+    await db.Employee.update(
+      { status: params.status },
+      { where: { userId: account.id } }
+    );
+  }
   account.updated = Date.now();
   await account.save();
 
@@ -251,8 +260,8 @@ function randomTokenString() {
 }
 // basic details - de luna
 function basicDetails(account) {
-  const { id, title, firstName, lastName, email, role, created, updated, isVerified } = account;
-  return { id, title, firstName, lastName, email, role, created, updated, isVerified };
+  const { id, title, firstName, lastName, email, role, status, created, updated, isVerified } = account;
+  return { id, title, firstName, lastName, email, role, status, created, updated, isVerified };
 }
 //send verfication email -rubi
 async function sendVerificationEmail(account, origin) {
