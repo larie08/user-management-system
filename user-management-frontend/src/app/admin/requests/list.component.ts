@@ -53,6 +53,7 @@ export class ListComponent implements OnInit {
             this.requestService.getByEmployeeId(this.employeeId)
                 .subscribe({
                     next: (requests) => {
+                        console.log('Loaded employee requests:', requests);
                         this.requests = requests;
                     },
                     error: (error) => {
@@ -64,6 +65,7 @@ export class ListComponent implements OnInit {
             this.requestService.getAll()
                 .subscribe({
                     next: (requests) => {
+                        console.log('Loaded all requests:', requests);
                         this.requests = requests;
                     },
                     error: (error) => {
@@ -120,8 +122,18 @@ export class ListComponent implements OnInit {
     }
 
     getItemsSummary(request: any): string {
-        if (!request.items || request.items.length === 0) return '';
-        return request.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ');
+        console.log('Getting items summary for request:', request);
+        
+        // Try using items first, then fall back to requestItems
+        if (request.items && request.items.length > 0) {
+            console.log('Using items property:', request.items);
+            return request.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ');
+        } else if (request.requestItems && request.requestItems.length > 0) {
+            console.log('Using requestItems property:', request.requestItems);
+            return request.requestItems.map((item: any) => `${item.name} (${item.quantity})`).join(', ');
+        }
+        console.log('No items found in request');
+        return '';
     }
 
     status(id: number, newStatus: string) {

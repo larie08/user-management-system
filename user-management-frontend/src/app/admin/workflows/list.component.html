@@ -42,8 +42,8 @@
                         <td *ngIf="account?.role === 'Admin'" class="align-middle text-center">
                             <div class="action-buttons">
                                 <select class="form-select form-select-sm d-inline-block w-auto me-2" 
-                                        [(ngModel)]="workflow.status" 
-                                        (change)="updateWorkflowStatus(workflow)">
+                                        [value]="workflow.status"
+                                        (change)="updateWorkflowStatus(workflow, $event.target.value)">
                                     <option value="Pending">Pending</option>
                                     <option value="Approved">Approved</option>
                                     <option value="Rejected">Rejected</option>

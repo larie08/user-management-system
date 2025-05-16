@@ -33,15 +33,22 @@
                         </td>
                         <td>{{request.type}}</td>
                         <td>
-                            <ng-container *ngIf="request.items && request.items.length > 0">
+                            <ng-container *ngIf="(request.items && request.items.length > 0) || (request.requestItems && request.requestItems.length > 0)">
                                 <span class="item-summary">
                                     {{ getItemsSummary(request) }}
                                 </span>
                                 <div class="item-count">
-                                    {{ request.items.length }} Item{{ request.items.length > 1 ? 's' : '' }}
+                                    {{ 
+                                        (request.items && request.items.length > 0 ? request.items.length : 
+                                         (request.requestItems ? request.requestItems.length : 0)) 
+                                    }} 
+                                    Item{{ 
+                                        (request.items && request.items.length > 1) || 
+                                        (request.requestItems && request.requestItems.length > 1) ? 's' : '' 
+                                    }}
                                 </div>
                             </ng-container>
-                            <span *ngIf="!request.items || request.items.length === 0">No items</span>
+                            <span *ngIf="(!request.items || request.items.length === 0) && (!request.requestItems || request.requestItems.length === 0)">No items</span>
                         </td>
                         <td>{{request.status}}</td>
                         <td>{{request.createdDate | date:'short'}}</td>
