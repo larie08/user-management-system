@@ -25,8 +25,11 @@ export class WorkflowService {
         return this.http.post(`${environment.apiUrl}/workflows`, workflow);
     }
 
-    update(id: number, workflow: Workflow) {
-        return this.http.put(`${environment.apiUrl}/workflows/${id}`, workflow);
+    update(id: number | string, workflow: Workflow) {
+        // Ensure ID is a number
+        const numericId = typeof id === 'string' ? parseInt(id) : id;
+        console.log(`WorkflowService: Updating workflow ${numericId}`, workflow);
+        return this.http.put(`${environment.apiUrl}/workflows/${numericId}`, workflow);
     }
 
     delete(id: number) {

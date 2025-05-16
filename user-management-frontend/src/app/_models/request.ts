@@ -12,6 +12,7 @@ export interface Request {
     employee: Employee;
     employeeId: number;
     requestItems: RequestItem[];
+    items?: RequestItem[]; // Added items property for frontend compatibility
     status: string;
     createdDate: Date;
 } 
