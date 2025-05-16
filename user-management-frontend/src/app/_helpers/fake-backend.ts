@@ -1,6 +1,4 @@
-// Author: Calderon, Marianne Mae
-// Description: This file implements a fake backend interceptor for development and testing purposes
-// It simulates API endpoints and handles authentication, user management, and HR-related operations
+// Calderon, Marianne Mae
 
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpResponse, HttpHandler, HttpEvent, HttpInterceptor, HTTP_INTERCEPTORS, HttpHeaders } from '@angular/common/http';
