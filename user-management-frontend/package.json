@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open",
-    "build": "ng build && cp static.json dist/user-management-frontend/",
+    "build": "npx ng build && cp static.json dist/user-management-frontend/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
