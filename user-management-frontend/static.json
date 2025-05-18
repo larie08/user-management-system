@@ -1,8 +1,8 @@
 {
-  "root": "dist/user-management-frontend",
+  "root": "dist/user-management-frontend/user-management-frontend",
   "routes": {
     "/**": {
       "rewrite": "/index.html"
     }
   }
-} 
+}
