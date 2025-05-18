@@ -37,12 +37,20 @@ export class AddEditComponent implements OnInit {
                 }
             });
 
-        // load users for dropdown
         this.accountService.getAll()
             .pipe(first())
             .subscribe({
                 next: (users) => {
-                    this.users = users;
+                    if (this.id && this.employee && this.employee.userId) {
+                        const employeeAccount = users.find(user => String(user.id) === String(this.employee.userId));
+                        let filteredUsers = users.filter(user => (user as any).status === 'Active');
+                        if (employeeAccount && (employeeAccount as any).status !== 'Active' && !filteredUsers.some(u => String(u.id) === String(employeeAccount.id))) {
+                            filteredUsers = [employeeAccount, ...filteredUsers];
+                        }
+                        this.users = filteredUsers;
+                    } else {
+                        this.users = users.filter(user => (user as any).status === 'Active');
+                    }
                 },
                 error: (error) => {
                     this.errorMessage = error;
