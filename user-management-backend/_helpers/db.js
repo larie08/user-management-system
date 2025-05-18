@@ -77,13 +77,31 @@ async function initialize() {
                 await sequelize.sync({ force: true });
                 console.log('Database tables created successfully');
             } else {
-                // If tables exist, only alter them
-                await sequelize.sync({ alter: true });
-                console.log('Database tables altered successfully');
+                // If tables exist, try to alter them safely
+                try {
+                    // First try to sync without altering
+                    await sequelize.sync();
+                    console.log('Database tables synchronized successfully');
+                } catch (syncError) {
+                    console.log('Initial sync failed, attempting to alter tables...');
+                    
+                    // If sync fails, try to alter tables one by one
+                    for (const modelName of Object.keys(sequelize.models)) {
+                        try {
+                            await sequelize.models[modelName].sync({ alter: true });
+                            console.log(`Table ${modelName} synchronized successfully`);
+                        } catch (modelError) {
+                            console.warn(`Warning: Could not sync table ${modelName}:`, modelError.message);
+                            // Continue with other tables even if one fails
+                            continue;
+                        }
+                    }
+                }
             }
         } catch (error) {
             console.error('Error syncing database:', error);
-            throw error;
+            // Don't throw the error, just log it and continue
+            console.log('Continuing despite sync errors...');
         }
     } catch (error) {
         console.error('Error initializing database:', error);
