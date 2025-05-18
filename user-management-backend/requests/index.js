@@ -33,9 +33,10 @@ async function create(req, res, next) {
         await db.Workflow.create({
             requestType: 'REQUEST',
             requestId: request.id.toString(),
+            employeeId: employeeId,
             status: 'PENDING',
             initiatedBy: req.user.id,
-            description: `Request #${request.requestNumber} - ${request.requestType}`,
+            description: `Request #${request.requestNumber} - ${request.type}`,
             workflowData: {
                 employeeId: employeeId,
                 requestNumber: request.requestNumber,

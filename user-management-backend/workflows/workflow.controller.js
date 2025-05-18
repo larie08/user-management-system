@@ -49,12 +49,9 @@ function deleteWorkflow(req, res, next) {
 
 function getWorkflowsByEmployeeId(req, res, next) {
     console.log('Getting workflows for employee ID:', req.params.employeeId);
-    // Use the db directly to query workflows by employee ID
     const db = require('_helpers/db');
-    
-    // Looking at the database screenshot, it seems requestId might be the field that contains the employee ID
     db.Workflow.findAll({
-        where: { requestId: req.params.employeeId.toString() },
+        where: { employeeId: req.params.employeeId },
         order: [['createdAt', 'DESC']]
     })
     .then(workflows => {

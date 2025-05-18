@@ -21,9 +21,10 @@ async function create(req, res, next) {
         await db.Workflow.create({
             requestType: 'ONBOARDING',
             requestId: employee.id.toString(),
+            employeeId: employee.id,
             status: 'PENDING',
             initiatedBy: req.user.id,
-            description: `Onboarding workflow for ${employee.firstName} ${employee.lastName}`,
+            description: 'Task: Setup workstation',
             workflowData: {
                 departmentId: req.body.departmentId,
                 employeeId: employee.id
@@ -108,6 +109,7 @@ async function transferEmployee(req, res, next) {
         await db.Workflow.create({
             requestType: 'TRANSFER',
             requestId: employeeId.toString(),
+            employeeId: employeeId,
             status: 'PENDING',
             initiatedBy: req.user.id,
             description: `Department transfer request: ${oldDepartmentName || 'Previous Dept'} → ${newDepartment.name}`,
