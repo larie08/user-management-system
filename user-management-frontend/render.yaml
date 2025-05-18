@@ -4,9 +4,6 @@ services:
     env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist/user-management-frontend
-    envVars:
-      - key: API_URL
-        value: https://user-management-system-backend-2lhk.onrender.com
     routes:
       - type: rewrite
         source: /*
