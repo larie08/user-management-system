@@ -1,4 +1,5 @@
 // Calderon, Marianne Mae
+
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpResponse, HttpHandler, HttpEvent, HttpInterceptor, HTTP_INTERCEPTORS, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
@@ -7,25 +8,25 @@ import { delay, materialize, dematerialize, mergeMap } from 'rxjs/operators';
 import { AlertService } from '@app/_services';
 import { Role } from '@app/_models';
 
-// array in local storage for accounts
+// Constants for local storage
 const accountsKey = 'angular-10-signup-verification-boilerplate-accounts';
 
-// Get accounts from local storage
+// Initialize accounts from local storage with default empty array if none exists
 let accounts = JSON.parse(localStorage.getItem(accountsKey)) || [];
 
-// Make sure all accounts have the required fields
+// Normalize account data to ensure all required fields exist
 accounts = accounts.map(account => {
-    // Default to active if not specified
+    // Set default active status if not specified
     if (account.isActive === undefined) {
         account.isActive = true;
     }
     
-    // Ensure admin accounts are always active
+    // Admin accounts are always active by default
     if (account.role === Role.Admin) {
         account.isActive = true;
     }
     
-    // Ensure refreshTokens array exists
+    // Initialize refresh tokens array if it doesn't exist
     if (!account.refreshTokens) {
         account.refreshTokens = [];
     }
@@ -33,32 +34,54 @@ accounts = accounts.map(account => {
     return account;
 });
 
-// Save the updated accounts back to localStorage
+// Persist normalized accounts back to localStorage
 localStorage.setItem(accountsKey, JSON.stringify(accounts));
 
 @Injectable()
 export class FakeBackendInterceptor implements HttpInterceptor {
+    // Mock data arrays for simulating database records
     private users = [
         { id: 1, email: 'admin@example.com', password: 'admin', role: Role.Admin, employeeId: 1 },
         { id: 2, email: 'user@example.com', password: 'user', role: Role.User, employeeId: 2 }
     ];
 
     private employees = [
+        // Sample employee records with basic information
         { id: 1, employeeId: 'EMP001', userId: 1, position: 'Developer', departmentId: 1, hireDate: '2025-01-01', status: 'Active' },
         { id: 2, employeeId: 'EMP002', userId: 2, position: 'Designer', departmentId: 2, hireDate: '2025-02-01', status: 'Active' }
     ];
 
     private departments = [
+        // Department records with employee counts
         { id: 1, name: 'Engineering', description: 'Software development team', employeeCount: 1 },
         { id: 2, name: 'Marketing', description: 'Marketing team', employeeCount: 1 }
     ];
 
     private workflows = [
-        { id: 1, employeeId: 1, type: 'Onboarding', details: { task: 'Setup workstation' }, status: 'Pending' }
+        // Sample workflow records for employee onboarding
+        { id: 1, employeeId: 1, type: 'Onboarding', details: { task: 'Setup workstation' }, status: 'Pending', createdDate: new Date().toISOString(), updatedDate: new Date().toISOString() }
     ];
 
-    private requests = [
-        { id: 1, employeeId: 2, type: 'Equipment', requestItems: [{ name: 'Laptop', quantity: 1 }], status: 'Pending' }
+    // Define a type that includes both items and requestItems
+    private requests: Array<{
+        id: number;
+        employeeId: number;
+        type: string;
+        requestItems?: Array<{ name: string; quantity: number }>;
+        items?: Array<{ name: string; quantity: number }>;
+        status: string;
+        createdDate?: string;
+    }> = [
+        // Equipment request records
+        { 
+            id: 1, 
+            employeeId: 2, 
+            type: 'Equipment', 
+            requestItems: [{ name: 'Laptop', quantity: 1 }],
+            items: [{ name: 'Laptop', quantity: 1 }],  // Make sure items is also populated
+            status: 'Pending',
+            createdDate: new Date().toISOString()
+        }
     ];
 
     constructor(private alertService: AlertService) {
@@ -225,6 +248,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                 case url.match(/\/employees\/\d+$/) && method === 'DELETE':
                     return deleteEmployee();
                 case url.match(/\/employees\/\d+\/transfer$/) && method === 'POST':
+                    console.log('Matched employee transfer route');
                     return transferEmployee();
                 case url.endsWith('/departments') && method === 'GET':
                     return getDepartments();
@@ -238,9 +262,19 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                     return deleteDepartment();
                 case url.match(/\/workflows\/employee\/\d+$/) && method === 'GET':
                     return getEmployeeWorkflows();
+                case url.endsWith('/workflows') && method === 'GET':
+                    console.log('Handling GET /workflows');
+                    return getAllWorkflows();
                 case url.endsWith('/workflows') && method === 'POST':
                     return createWorkflow();
+                case url.match(/\/workflows\/\d+$/) && method === 'PUT':
+                    console.log('Handling PUT /workflows/:id');
+                    return updateWorkflow();
+                case url.match(/\/workflows\/\d+$/) && method === 'DELETE':
+                    console.log('Handling DELETE /workflows/:id');
+                    return deleteWorkflow();
                 case url.endsWith('/requests') && method === 'GET':
+                    console.log('Handling GET /requests');
                     return getRequests();
                 case url.endsWith('/requests') && method === 'POST':
                     return createRequest();
@@ -248,6 +282,12 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                     return updateRequest();
                 case url.match(/\/requests\/\d+$/) && method === 'DELETE':
                     return deleteRequest();
+                case url.match(/\/requests\/employee\/\d+$/) && method === 'GET':
+                    console.log('Handling GET /requests/employee/:id');
+                    return getEmployeeRequests();
+                case url.match(/\/requests\/\d+$/) && method === 'GET':
+                    console.log('Handling GET /requests/:id');
+                    return getRequestById();
                 default:
                     // pass through any requests not handled above
                     return next.handle(request);
@@ -259,22 +299,42 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return authorize(null, () => {
                 // Additional logging to debug authorization issues
                 console.log('Fake backend: Authorized user accessing employees data');
+                console.log('Current employees:', self.employees);
+                console.log('Available departments:', self.departments);
+                
                 // Attach account and department info to each employee
                 const employeesWithDetails = self.employees.map(emp => {
                     const account = accounts.find(acc => acc.id === emp.userId);
-                    const department = self.departments.find(dep => dep.id === emp.departmentId);
+                    
+                    // Find department by ID, ensuring departmentId is parsed as a number for comparison
+                    const departmentId = typeof emp.departmentId === 'string' ? parseInt(emp.departmentId) : emp.departmentId;
+                    const department = self.departments.find(dep => dep.id === departmentId);
+                    
+                    console.log(`Processing employee ${emp.id}:`, {
+                        employeeId: emp.id,
+                        departmentId: emp.departmentId,
+                        parsedDepartmentId: departmentId,
+                        foundDepartment: department ? `${department.name} (ID: ${department.id})` : 'Not found'
+                    });
+                    
                     return {
                         ...emp,
+                        departmentId: departmentId, // Ensure departmentId is stored as number
                         account: account ? { ...account } : undefined,
                         department: department ? { ...department } : undefined
                     };
                 });
+                
+                console.log('Returning employees with details:', employeesWithDetails);
                 return ok(employeesWithDetails);
             });
         }
         
         function createEmployee() {
             return authorize(Role.Admin, () => {
+                console.log('Creating employee with data:', body);
+                
+                // Create a new employee object with a new ID
                 const employee = { id: self.employees.length + 1, ...body };
                 
                 // Make sure the employee has a userId (account) and departmentId
@@ -283,12 +343,29 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                     employee.userId = 1; // Default to admin
                 }
                 
+                // Ensure departmentId exists and is a number
                 if (!employee.departmentId) {
                     console.warn('Employee created without departmentId! Setting to default value');
                     employee.departmentId = 1; // Default to first department
+                } else {
+                    // Convert departmentId to number if it's a string
+                    employee.departmentId = typeof employee.departmentId === 'string' ? 
+                        parseInt(employee.departmentId) : employee.departmentId;
                 }
                 
                 console.log('Creating employee:', employee);
+                
+                // Find the department to confirm it exists and update its employee count
+                const department = self.departments.find(d => d.id === employee.departmentId);
+                if (department) {
+                    console.log(`Found department for employee: ${department.name} (ID: ${department.id})`);
+                    // Increment the department's employee count
+                    department.employeeCount = (department.employeeCount || 0) + 1;
+                    console.log(`Updated department employee count to: ${department.employeeCount}`);
+                } else {
+                    console.warn(`Department with ID ${employee.departmentId} not found!`);
+                }
+                
                 self.employees.push(employee);
                 
                 // Automatically create an onboarding workflow for the new employee
@@ -305,15 +382,57 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                 
                 console.log(`Created onboarding workflow for new employee:`, onboardingWorkflow);
                 
-                return ok(employee);
+                // Create response with department details
+                const employeeWithDepartment = { 
+                    ...employee,
+                    department: department ? { ...department } : undefined
+                };
+                
+                console.log('Returning employee with department details:', employeeWithDepartment);
+                return ok(employeeWithDepartment);
             });
         }
         
         function getEmployeeById() {
             return authorize(null, () => {
                 const id = parseInt(url.split('/').pop()!);
+                console.log(`Getting employee with ID: ${id}`);
+                
+                // Find the base employee
                 const employee = self.employees.find(e => e.id === id);
-                return employee ? ok(employee) : error('Employee not found');
+                
+                if (!employee) {
+                    console.error(`Employee with ID ${id} not found`);
+                    return error('Employee not found');
+                }
+                
+                console.log(`Found employee:`, employee);
+                
+                // Create a copy to add additional data using 'as any' to avoid TypeScript errors
+                const employeeWithDetails = { ...employee } as any;
+                
+                // Find and attach account
+                const account = accounts.find(acc => acc.id === employee.userId);
+                if (account) {
+                    employeeWithDetails.account = { ...account };
+                }
+                
+                // Find and attach department with proper type conversion
+                const departmentId = typeof employee.departmentId === 'string' ? 
+                    parseInt(employee.departmentId) : employee.departmentId;
+                
+                const department = self.departments.find(dep => dep.id === departmentId);
+                console.log(`Looking for department with ID ${departmentId}:`, department);
+                
+                if (department) {
+                    employeeWithDetails.department = { ...department };
+                }
+                
+                // Ensure departmentId is stored as a number
+                employeeWithDetails.departmentId = departmentId;
+                
+                console.log(`Returning enriched employee:`, employeeWithDetails);
+                return ok(employeeWithDetails);
             });
         }
         
@@ -337,17 +456,36 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         
         function transferEmployee() {
             return authorize(Role.Admin, () => {
-                const id = parseInt(url.split('/')[2]);
+                console.log('Transfer employee called with URL:', url);
+                console.log('Request body:', body);
+                
+                // Extract the employee ID correctly from the URL
+                // The employee ID should be the last part of the URL path
+                const urlParts = url.split('/');
+                const id = parseInt(urlParts[urlParts.length - 2]); // Get the ID from /employees/:id/transfer
+                console.log('Looking for employee with ID:', id);
+                console.log('Available employees:', self.employees);
+                
                 const employee = self.employees.find(e => e.id === id);
-                if (!employee) return error('Employee not found');
+                if (!employee) {
+                    console.error(`Employee with ID ${id} not found`);
+                    return error('Employee not found');
+                }
+                
+                console.log('Found employee:', employee);
                 employee.departmentId = body.departmentId;
+                
                 self.workflows.push({ 
                     id: self.workflows.length + 1, 
                     employeeId: id, 
                     type: 'Transfer', 
                     details: body, 
-                    status: 'Pending' 
+                    status: 'Pending',
+                    createdDate: new Date().toISOString(),
+                    updatedDate: new Date().toISOString()
                 });
+                
+                console.log('Employee transferred successfully to department:', body.departmentId);
                 return ok({ message: 'Employee transferred' });
             });
         }
@@ -427,26 +565,136 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                 console.log(`Fake backend: Getting workflows for employee ID ${employeeId}`);
                 
                 let workflows = self.workflows.filter(w => w.employeeId === employeeId);
+                console.log(`Filtered workflows before enhancement:`, workflows);
                 
                 // Enhance workflows with additional properties
-                workflows = workflows.map(workflow => ({
-                    ...workflow,
-                    createdDate: new Date().toISOString(),
-                    updatedDate: new Date().toISOString(),
-                    type: workflow.type || 'Unknown',
-                    status: workflow.status || 'Pending'
-                }));
+                workflows = workflows.map(workflow => {
+                    console.log(`Preparing workflow ${workflow.id} with status: ${workflow.status}`);
+                    
+                    // Preserve the existing status value exactly as is
+                    const currentStatus = workflow.status;
+                    console.log(`Current status for workflow ${workflow.id}: "${currentStatus}"`);
+                    
+                    return {
+                        ...workflow,
+                        createdDate: workflow.createdDate || new Date().toISOString(),
+                        updatedDate: workflow.updatedDate || new Date().toISOString(),
+                        type: workflow.type || 'Unknown',
+                        // Make sure we're not accidentally changing the status
+                        status: currentStatus
+                    };
+                });
                 
                 console.log(`Fake backend: Found ${workflows.length} workflows:`, workflows);
                 return ok(workflows);
             });
         }
         
+        function getAllWorkflows() {
+            return authorize(Role.Admin, () => {
+                console.log('Getting all workflows');
+                console.log('Original workflows before processing:', self.workflows);
+                
+                // Enhance all workflows with additional properties
+                const enhancedWorkflows = self.workflows.map(workflow => {
+                    // Get the related employee
+                    const employee = self.employees.find(e => e.id === workflow.employeeId);
+                    
+                    // Preserve the original status value
+                    const currentStatus = workflow.status;
+                    console.log(`Workflow ${workflow.id} has status: "${currentStatus}"`);
+                    
+                    // Create enhanced workflow with all required properties
+                    const enhancedWorkflow = {
+                        ...workflow,
+                        createdDate: workflow.createdDate || new Date().toISOString(),
+                        updatedDate: workflow.updatedDate || new Date().toISOString(),
+                        type: workflow.type || 'Unknown',
+                        status: currentStatus, // Use the preserved status value directly
+                        employee: employee ? { ...employee } : undefined
+                    };
+                    
+                    return enhancedWorkflow;
+                });
+                
+                console.log(`Found ${enhancedWorkflows.length} workflows:`, enhancedWorkflows);
+                return ok(enhancedWorkflows);
+            });
+        }
+        
         function createWorkflow() {
             return authorize(Role.Admin, () => {
-                const workflow = { id: self.workflows.length + 1, ...body };
+                const workflow = { 
+                    id: self.workflows.length + 1, 
+                    ...body,
+                    // Ensure required properties exist
+                    createdDate: body.createdDate || new Date().toISOString(),
+                    updatedDate: body.updatedDate || new Date().toISOString()
+                };
                 self.workflows.push(workflow);
                 return ok(workflow);
+            });
+        }
+        
+        function updateWorkflow() {
+            return authorize(Role.Admin, () => {
+                // Extract the workflow ID from the URL
+                const id = parseInt(url.split('/').pop()!);
+                console.log(`Updating workflow with ID: ${id}`);
+                console.log('Update body:', body);
+                
+                // Find the workflow in our collection
+                const workflowIndex = self.workflows.findIndex(w => w.id === id);
+                
+                if (workflowIndex === -1) {
+                    console.error(`Workflow with ID ${id} not found`);
+                    return error('Workflow not found');
+                }
+                
+                // Update the workflow (using type assertion to avoid TypeScript errors)
+                const oldWorkflow = self.workflows[workflowIndex];
+                
+                // Properly extract the status from the request body
+                const newStatus = body.status;
+                console.log('New status from request body:', newStatus);
+                
+                const updatedWorkflow = { 
+                    ...oldWorkflow,
+                    ...body,
+                    id, // Preserve the original ID
+                    employeeId: oldWorkflow.employeeId, // Ensure employeeId is preserved
+                    status: newStatus || oldWorkflow.status // Ensure status is updated correctly
+                };
+                
+                // Update the workflow in the array
+                self.workflows[workflowIndex] = updatedWorkflow;
+                
+                console.log('Original workflow:', oldWorkflow);
+                console.log('Updated workflow:', updatedWorkflow);
+                
+                return ok(updatedWorkflow);
+            });
+        }
+        
+        function deleteWorkflow() {
+            return authorize(Role.Admin, () => {
+                // Extract the workflow ID from the URL
+                const id = parseInt(url.split('/').pop()!);
+                console.log(`Deleting workflow with ID: ${id}`);
+                
+                // Check if workflow exists
+                const workflowExists = self.workflows.some(w => w.id === id);
+                
+                if (!workflowExists) {
+                    console.error(`Workflow with ID ${id} not found`);
+                    return error('Workflow not found');
+                }
+                
+                // Remove the workflow
+                self.workflows = self.workflows.filter(w => w.id !== id);
+                
+                console.log(`Workflow with ID ${id} deleted successfully`);
+                return ok({ message: 'Workflow deleted successfully' });
             });
         }
         
@@ -454,14 +702,46 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             // Allow both admin and regular users to see requests
             return authorize(null, () => {
                 const user = getUser();
+                console.log('User in getRequests:', user);
+                console.log('Original requests:', self.requests);
+                
+                // Normalize requests to include both items and requestItems for frontend compatibility
+                const normalizedRequests = self.requests.map(request => {
+                    // Create a copy of the request with type that includes 'items'
+                    const normalized = { ...request } as any;
+                    
+                    // Ensure items is available if requestItems exists
+                    if (normalized.requestItems && !normalized.items) {
+                        normalized.items = [...normalized.requestItems];
+                        console.log('Added items from requestItems:', normalized.items);
+                    }
+                    
+                    // Ensure requestItems is available if items exists
+                    if (normalized.items && !normalized.requestItems) {
+                        normalized.requestItems = [...normalized.items];
+                        console.log('Added requestItems from items:', normalized.requestItems);
+                    }
+                    
+                    // Important: add employee reference (needed for proper display)
+                    const employeeObj = self.employees.find(e => e.id === normalized.employeeId);
+                    if (employeeObj) {
+                        normalized.employee = employeeObj;
+                        console.log('Added employee reference to request:', normalized.employee);
+                    }
+                    
+                    return normalized;
+                });
+                
+                console.log('Normalized requests:', normalizedRequests);
                 
                 // If admin, return all requests
                 if (user.role === Role.Admin) {
-                    return ok(self.requests);
+                    console.log('Returning all requests for admin');
+                    return ok(normalizedRequests);
                 }
                 
                 // If regular user, return only their requests
-                const userRequests = self.requests.filter(r => r.employeeId === user.employeeId);
+                const userRequests = normalizedRequests.filter(r => r.employeeId === user.employeeId);
                 console.log(`Filtered requests for user ${user.email}:`, userRequests);
                 return ok(userRequests);
             });
@@ -500,9 +780,17 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                     ...body 
                 };
                 
-                // Ensure requestItems is an array
+                // Ensure requestItems and items arrays are both populated
                 if (!request.requestItems) {
                     request.requestItems = [];
+                }
+                
+                // Make sure items exists and mirrors requestItems
+                if (!request.items) {
+                    request.items = [...(request.requestItems || [])];
+                } else if (request.requestItems) {
+                    // Sync items with requestItems if both exist
+                    request.items = [...request.requestItems];
                 }
                 
                 console.log('Request created:', request);
@@ -531,6 +819,86 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                 const id = parseInt(url.split('/').pop()!);
                 self.requests = self.requests.filter(r => r.id !== id);
                 return ok({ message: 'Request deleted' });
+            });
+        }
+        
+        function getEmployeeRequests() {
+            return authorize(null, () => {
+                // Extract the employee ID from the URL
+                const urlParts = url.split('/');
+                const employeeId = parseInt(urlParts[urlParts.length - 1]);
+                console.log('Looking for requests with employeeId:', employeeId);
+                
+                // Process all requests similar to getRequests function
+                const normalizedRequests = self.requests.map(request => {
+                    const normalized = { ...request } as any;
+                    
+                    // Ensure items is available
+                    if (normalized.requestItems && !normalized.items) {
+                        normalized.items = [...normalized.requestItems];
+                        console.log('Added items from requestItems:', normalized.items);
+                    }
+                    
+                    // Ensure requestItems is available
+                    if (normalized.items && !normalized.requestItems) {
+                        normalized.requestItems = [...normalized.items];
+                        console.log('Added requestItems from items:', normalized.requestItems);
+                    }
+                    
+                    // Add employee reference
+                    const employeeObj = self.employees.find(e => e.id === normalized.employeeId);
+                    if (employeeObj) {
+                        normalized.employee = employeeObj;
+                        console.log('Added employee reference to request:', normalized.employee);
+                    }
+                    
+                    return normalized;
+                });
+                
+                // Filter requests for the specific employee
+                const employeeRequests = normalizedRequests.filter(r => r.employeeId === employeeId);
+                console.log(`Found ${employeeRequests.length} requests for employee ${employeeId}:`, employeeRequests);
+                
+                return ok(employeeRequests);
+            });
+        }
+        
+        function getRequestById() {
+            return authorize(null, () => {
+                // Extract the request ID from the URL
+                const id = parseInt(url.split('/').pop()!);
+                console.log('Looking for request with ID:', id);
+                
+                // Find the request in our collection
+                const request = self.requests.find(r => r.id === id);
+                
+                if (!request) {
+                    console.error(`Request with ID ${id} not found`);
+                    return error('Request not found');
+                }
+                
+                // Normalize the request data
+                const normalized = { ...request } as any;
+                
+                // Ensure items is available if requestItems exists
+                if (normalized.requestItems && !normalized.items) {
+                    normalized.items = [...normalized.requestItems];
+                }
+                
+                // Ensure requestItems is available if items exists
+                if (normalized.items && !normalized.requestItems) {
+                    normalized.requestItems = [...normalized.items];
+                }
+                
+                // Add employee reference
+                const employeeObj = self.employees.find(e => e.id === normalized.employeeId);
+                if (employeeObj) {
+                    normalized.employee = employeeObj;
+                    console.log('Added employee reference to request:', normalized.employee);
+                }
+                
+                console.log('Returning request:', normalized);
+                return ok(normalized);
             });
         }
 

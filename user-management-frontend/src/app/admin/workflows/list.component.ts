@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { WorkflowService } from '../../_services/workflow.service';
 import { AccountService } from '../../_services/account.service';
+import { Workflow, WorkflowStatus } from '../../_models/workflow';
 
 @Component({
     selector: 'app-list',
@@ -9,7 +10,7 @@ import { AccountService } from '../../_services/account.service';
     // styleUrls: ['/list.component.css']
 })
 export class ListComponent implements OnInit {
-    workflows: any[] = [];
+    workflows: Workflow[] = [];
     account: any;
     errorMessage: string = '';
     employeeId: number = null;
@@ -47,10 +48,15 @@ export class ListComponent implements OnInit {
 
     loadWorkflows() {
         if (this.employeeId) {
+            console.log('Loading workflows for employee ID:', this.employeeId);
             this.workflowService.getByEmployeeId(this.employeeId)
                 .subscribe({
                     next: (workflows) => {
+                        console.log('Workflows received from API:', workflows);
                         this.workflows = workflows;
+                        if (workflows.length === 0) {
+                            console.log('No workflows found for this employee');
+                        }
                     },
                     error: (error) => {
                         console.error('Error loading workflows:', error);
@@ -58,10 +64,15 @@ export class ListComponent implements OnInit {
                     }
                 });
         } else {
+            console.log('Loading all workflows');
             this.workflowService.getAll()
                 .subscribe({
                     next: (workflows) => {
+                        console.log('All workflows received from API:', workflows);
                         this.workflows = workflows;
+                        if (workflows.length === 0) {
+                            console.log('No workflows found');
+                        }
                     },
                     error: (error) => {
                         console.error('Error loading workflows:', error);
@@ -102,22 +113,43 @@ export class ListComponent implements OnInit {
         }
     }
 
-    updateWorkflowStatus(workflow: any) {
-        const updatedWorkflow = { ...workflow };
-        this.workflowService.update(workflow.id.toString(), updatedWorkflow)
+    updateWorkflowStatus(workflow: Workflow, newStatus: string) {
+        console.log('Updating workflow:', workflow);
+        console.log('New status:', newStatus);
+
+        // Create a copy of the workflow with the new status
+        const updatedWorkflow = {
+            ...workflow,
+            status: newStatus as WorkflowStatus
+        };
+
+        this.workflowService.update(workflow.id, updatedWorkflow)
             .subscribe({
-                next: () => {
-                    console.log(`Workflow status updated to ${workflow.status}`);
+                next: (response) => {
+                    console.log('Workflow updated successfully:', response);
+                    
+                    // Update the workflow in the local array
+                    const index = this.workflows.findIndex(w => w.id === workflow.id);
+                    if (index !== -1) {
+                        this.workflows[index].status = newStatus as WorkflowStatus;
+                        // Create a new array reference to trigger change detection
+                        this.workflows = [...this.workflows];
+                    }
                 },
                 error: (error) => {
-                    console.error('Error updating workflow status:', error);
+                    console.error('Error updating workflow:', error);
                     this.errorMessage = 'Error updating workflow status';
-                    // Revert status change on error
-                    this.loadWorkflows();
+                    // Revert the status in case of error
+                    const index = this.workflows.findIndex(w => w.id === workflow.id);
+                    if (index !== -1) {
+                        this.workflows[index].status = workflow.status;
+                        // Create a new array reference to trigger change detection
+                        this.workflows = [...this.workflows];
+                    }
                 }
             });
     }
-    
+
     // Helper methods for displaying workflow details
     isObject(value: any): boolean {
         return value !== null && typeof value === 'object';

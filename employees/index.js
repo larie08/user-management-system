@@ -16,6 +16,20 @@ router.post('/:id/transfer', authorize(), transferEmployee);
 async function create(req, res, next) {
     try {
         const employee = await db.Employee.create(req.body);
+        
+        // Create onboarding workflow
+        await db.Workflow.create({
+            requestType: 'ONBOARDING',
+            requestId: employee.id.toString(),
+            status: 'PENDING',
+            initiatedBy: req.user.id,
+            description: `Onboarding workflow for ${employee.firstName} ${employee.lastName}`,
+            workflowData: {
+                departmentId: req.body.departmentId,
+                employeeId: employee.id
+            }
+        });
+
         res.status(201).json(employee);
     } catch (err) { next(err); }
 }
@@ -63,37 +77,64 @@ async function _delete(req, res, next) {
     } catch (err) { next(err); }
 }
 
-async function transfer(req, res, next) {
+async function transferEmployee(req, res, next) {
     try {
-        const employee = await db.Employee.findByPk(req.params.id);
-        if (!employee) throw new Error('Employee not found');
-        await employee.update({ departmentId: req.body.departmentId });
+        const { departmentId } = req.body;
+        const employeeId = req.params.id;
+
+        if (!departmentId) {
+            return res.status(400).json({ message: 'Department ID is required' });
+        }
+
+        // Find the employee
+        const employee = await db.Employee.findByPk(employeeId, {
+            include: [{ model: db.Department, attributes: ['name'] }]
+        });
+
+        if (!employee) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+
+        const oldDepartmentId = employee.departmentId;
+        const oldDepartmentName = employee.Department?.name;
+
+        // Find the new department
+        const newDepartment = await db.Department.findByPk(departmentId);
+        if (!newDepartment) {
+            return res.status(404).json({ message: 'New department not found' });
+        }
+
+        // Create transfer workflow
         await db.Workflow.create({
-            employeeId: employee.id,
-            type: 'Transfer',
-            details: { newDepartmentId: req.body.departmentId }
+            requestType: 'TRANSFER',
+            requestId: employeeId.toString(),
+            status: 'PENDING',
+            initiatedBy: req.user.id,
+            description: `Department transfer request: ${oldDepartmentName || 'Previous Dept'} → ${newDepartment.name}`,
+            workflowData: {
+                employeeId: employeeId,
+                fromDepartmentId: oldDepartmentId,
+                toDepartmentId: departmentId,
+                fromDepartmentName: oldDepartmentName,
+                toDepartmentName: newDepartment.name
+            }
         });
-        res.json({ message: 'Employee transferred' });
-    } catch (err) { next(err); }
-}
 
-function transferEmployee(req, res, next) {
-    // Get the employee ID from the URL
-    const id = parseInt(req.params.id);
-    
-    // Get the new department ID from the request body
-    const { departmentId } = req.body;
-    
-    if (!departmentId) {
-        return res.status(400).json({ message: 'Department ID is required' });
+        // Update employee's department
+        await employee.update({ departmentId });
+
+        res.json({
+            message: 'Employee transferred successfully',
+            employee: {
+                id: employee.id,
+                departmentId: departmentId,
+                departmentName: newDepartment.name
+            }
+        });
+    } catch (err) {
+        console.error('Transfer error:', err);
+        next(err);
     }
-
-    db.Employee.transfer(id, parseInt(departmentId))
-        .then(() => res.json({ message: 'Employee transferred successfully' }))
-        .catch(err => {
-            console.error('Transfer error:', err);
-            next(err);
-        });
 }
 
 module.exports = router;

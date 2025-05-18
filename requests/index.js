@@ -28,6 +28,22 @@ async function create(req, res, next) {
         }, {
             include: [{ model: db.RequestItem, as: 'items' }]
         });
+
+        // Create workflow for the request
+        await db.Workflow.create({
+            requestType: 'REQUEST',
+            requestId: request.id.toString(),
+            status: 'PENDING',
+            initiatedBy: req.user.id,
+            description: `Request #${request.requestNumber} - ${request.requestType}`,
+            workflowData: {
+                employeeId: employeeId,
+                requestNumber: request.requestNumber,
+                requestType: request.requestType,
+                items: request.items
+            }
+        });
+
         res.status(201).json(request);
     } catch (err) { next(err); }
 }

@@ -15,6 +15,7 @@ export class AddEditComponent implements OnInit {
     request: any = {
         type: '',
         items: [],
+        requestItems: [],
         employeeId: null
     };
     errorMessage: string = '';
@@ -116,6 +117,9 @@ export class AddEditComponent implements OnInit {
             this.errorMessage = 'Employee ID is required';
             return;
         }
+
+        // Ensure both items and requestItems are synchronized
+        this.request.requestItems = [...this.request.items];
 
         this.loading = true;
         if (this.id) {
