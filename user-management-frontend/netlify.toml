@@ -1,0 +1,9 @@
+[build]
+  base = "user-management-frontend"
+  publish = "dist/user-management-frontend"
+  command = "npm install && ng build --prod"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
