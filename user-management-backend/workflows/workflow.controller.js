@@ -36,9 +36,16 @@ function getWorkflowById(req, res, next) {
 }
 
 function updateWorkflow(req, res, next) {
+    console.log('Updating workflow:', req.params.id, req.body);
     workflowService.update(req.params.id, req.body)
-        .then(workflow => res.json(workflow))
-        .catch(err => next(err));
+        .then(workflow => {
+            console.log('Workflow updated successfully:', workflow);
+            res.json(workflow);
+        })
+        .catch(err => {
+            console.error('Error updating workflow:', err);
+            next(err);
+        });
 }
 
 function deleteWorkflow(req, res, next) {

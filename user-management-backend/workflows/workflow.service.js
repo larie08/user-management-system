@@ -1,5 +1,4 @@
-const db = require('_helpers/db');
-const Workflow = db.Workflow;
+const db = require('../_helpers/db');
 
 module.exports = {
     create,
@@ -11,48 +10,75 @@ module.exports = {
 };
 
 async function create(workflowParam) {
-    const workflow = new Workflow(workflowParam);
-    await workflow.save();
-    return workflow;
+    return await db.Workflow.create(workflowParam);
 }
 
 async function getAll() {
-    return await Workflow.find()
-        .populate('initiatedBy', 'firstName lastName email')
-        .populate('assignedTo', 'firstName lastName email')
-        .sort('-createdAt');
+    return await db.Workflow.findAll({
+        include: [
+            {
+                model: db.Account,
+                as: 'initiator',
+                attributes: ['firstName', 'lastName', 'email']
+            },
+            {
+                model: db.Account,
+                as: 'assignee',
+                attributes: ['firstName', 'lastName', 'email']
+            }
+        ],
+        order: [['createdAt', 'DESC']]
+    });
 }
 
 async function getById(id) {
-    return await Workflow.findById(id)
-        .populate('initiatedBy', 'firstName lastName email')
-        .populate('assignedTo', 'firstName lastName email');
+    return await db.Workflow.findByPk(id, {
+        include: [
+            {
+                model: db.Account,
+                as: 'initiator',
+                attributes: ['firstName', 'lastName', 'email']
+            },
+            {
+                model: db.Account,
+                as: 'assignee',
+                attributes: ['firstName', 'lastName', 'email']
+            }
+        ]
+    });
+}
+
+async function getByEmployeeId(employeeId) {
+    return await db.Workflow.findAll({
+        where: { employeeId },
+        include: [
+            {
+                model: db.Account,
+                as: 'initiator',
+                attributes: ['firstName', 'lastName', 'email']
+            },
+            {
+                model: db.Account,
+                as: 'assignee',
+                attributes: ['firstName', 'lastName', 'email']
+            }
+        ],
+        order: [['createdAt', 'DESC']]
+    });
 }
 
 async function update(id, workflowParam) {
-    const workflow = await Workflow.findById(id);
+    const workflow = await db.Workflow.findByPk(id);
     
     if (!workflow) throw 'Workflow not found';
     
-    Object.assign(workflow, {
-        ...workflowParam,
-        updatedAt: Date.now()
-    });
-    
-    await workflow.save();
+    await workflow.update(workflowParam);
     return workflow;
 }
 
 async function _delete(id) {
-    await Workflow.findByIdAndRemove(id);
-}
-
-async function getByEmployeeId(employeeId) {
-    // Find workflows related to an employee by employeeId
-    return await Workflow.findAll({
-        where: {
-            employeeId: employeeId
-        },
-        order: [['createdAt', 'DESC']]
-    });
+    const workflow = await db.Workflow.findByPk(id);
+    if (workflow) {
+        await workflow.destroy();
+    }
 }
