@@ -22,7 +22,7 @@ git clone https://github.com/larie08/user-management-system.git to an external s
 ## Intializing the Project
 
 1. Install dependencies:
-npm install bcryptjs
+npm install bcryptjs 
 npm install body-parser
 npm install cookie-parser
 npm install cors   
