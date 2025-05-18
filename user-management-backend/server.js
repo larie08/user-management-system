@@ -14,11 +14,6 @@ app.use(cookieParser());
 //allow cors requests from any origin and with credentials
 app.use(cors({ origin: (origin, callback) => callback(null, true), credentials: true }));
 
-// Root route - redirect to API docs
-app.get('/', (req, res) => {
-    res.redirect('/api-docs');
-});
-
 //api routes
 app.use('/accounts', require('./accounts/accounts.controller'));
 app.use('/departments', require('./departments/departments.controller'));
