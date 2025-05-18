@@ -1,0 +1,19 @@
+module.exports = {
+    database: {
+        host: process.env.DB_HOST || "153.92.15.31",
+        port: process.env.DB_PORT || 3306,
+        user: process.env.DB_USER || "u875409848_cornelio",
+        password: process.env.DB_PASSWORD || "9T2Z5$3UKkgSYzE",
+        database: process.env.DB_NAME || "u875409848_cornelio"
+    },
+    secret: process.env.JWT_SECRET || "z3UG88nutkGpKUbjC6yz/g==",
+    emailFrom: "info@node-mysql-signup-verification-api.com",
+    smtpOptions: {
+        host: process.env.SMTP_HOST || "smtp.ethereal.email",
+        port: process.env.SMTP_PORT || 587,
+        auth: {
+            user: process.env.SMTP_USER || "florence.torp@ethereal.email",
+            pass: process.env.SMTP_PASS || "jsTHxPc1pDcR2utG5k"
+        }
+    }
+}; 
