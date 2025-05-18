@@ -1,6 +1,2 @@
-#!/bin/env/bash
-
-# Build the project
-npm run build
-
-# Deploy to Render
+#!/usr/bin/env bash
+    npm install
