@@ -34,8 +34,8 @@
             "styles": [
               "src/styles.less"
             ],
-            "scripts": []
-            
+            "scripts": [],
+            "baseHref": "/"
           },
           "configurations": {
             "production": {
@@ -51,7 +51,8 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "/"
             },
             "development": {
               "optimization": false,
