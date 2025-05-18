@@ -1,5 +1,8 @@
 {
-  "rewrites": [
-    { "source": "**", "destination": "/index.html" }
-  ]
-}
+  "root": "dist/user-management-frontend",
+  "routes": {
+    "/**": {
+      "rewrite": "/index.html"
+    }
+  }
+} 
