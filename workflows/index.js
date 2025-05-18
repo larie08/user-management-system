@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../helpers/db');
-const authorize = require('../middleware/authorize');
-const Role = require('../helpers/role');
+const db = require('../_helpers/db');
+const authorize = require('../_middleware/authorize');
+const Role = require('../_helpers/role');
 
 router.post('/', authorize(Role.Admin), create);
 router.get('/employee/:employeeId', authorize(), getByEmployeeId);
@@ -49,8 +49,23 @@ async function onboarding(req, res, next) {
 
 async function getAll(req, res, next) {
     try {
-        const workflows = await db.Workflow.findAll();
+        const workflows = await db.Workflow.findAll({
+            include: [
+                {
+                    model: db.Account,
+                    as: 'initiator',
+                    attributes: ['firstName', 'lastName', 'email']
+                },
+                {
+                    model: db.Account,
+                    as: 'assignee',
+                    attributes: ['firstName', 'lastName', 'email']
+                }
+            ],
+            order: [['createdAt', 'DESC']]
+        });
         res.json(workflows);
+
     } catch (err) { next(err); }
 }
 
