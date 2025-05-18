@@ -6,6 +6,10 @@ import { first } from 'rxjs/operators';
 import { AccountService, AlertService } from '@app/_services';
 import { MustMatch } from '@app/_helpers';
 
+interface RegisterResponse {
+    isFirstAccount: boolean;
+}
+
 @Component({ templateUrl: 'register.component.html' })
 export class RegisterComponent implements OnInit {
     form: UntypedFormGroup;
@@ -52,8 +56,12 @@ export class RegisterComponent implements OnInit {
         this.accountService.register(this.form.value)
             .pipe(first())
             .subscribe({
-                next: () => {
-                    this.alertService.success('Registration successful, please check your email for verification instructions', { keepAfterRouteChange: true });
+                next: (response: RegisterResponse) => {
+                    if (response.isFirstAccount) {
+                        this.alertService.success('Registration successful! You have been automatically verified as the first admin user.', { keepAfterRouteChange: true });
+                    } else {
+                        this.alertService.success('Registration successful, please check your email for verification instructions', { keepAfterRouteChange: true });
+                    }
                     this.router.navigate(['../login'], { relativeTo: this.route });
                 },
                 error: error => {

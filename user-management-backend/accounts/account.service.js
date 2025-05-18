@@ -91,10 +91,15 @@ async function register(params, origin) {
     // create account object
     const account = new db.Account(params);
 
-    // first registered account is an admin
+    // first registered account is an admin and is automatically verified
     const isFirstAccount = (await db.Account.count()) === 0;
     account.role = isFirstAccount ? Role.Admin : Role.User;
     account.verificationToken = randomTokenString();
+    
+    if (isFirstAccount) {
+        account.verified = Date.now();
+        account.verificationToken = null;
+    }
 
     // hash password
     account.passwordHash = await hash(params.password);
@@ -102,8 +107,13 @@ async function register(params, origin) {
     // save account
     await account.save();
 
-    // send email
-    await sendVerificationEmail(account, origin);
+    // send email only if not the first account
+    if (!isFirstAccount) {
+        await sendVerificationEmail(account, origin);
+    }
+
+    // return whether this is the first account
+    return { isFirstAccount };
 }
 
 //verify email - rubi
