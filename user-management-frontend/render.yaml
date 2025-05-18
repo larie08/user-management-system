@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: user-management-frontend
+    env: node
+    buildCommand: npm install && npm run build -- --configuration production
+    startCommand: npx serve -s dist/user-management-frontend
+    envVars:
+      - key: NODE_VERSION
+        value: 18.0.0 
