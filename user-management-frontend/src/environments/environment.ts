@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://user-management-system-backend-2lhk.onrender.com'
+  apiUrl: process.env['API_URL'] || 'https://user-management-system-backend-2lhk.onrender.com'
 };
 
 /*
