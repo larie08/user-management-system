@@ -14,11 +14,14 @@ export interface WorkflowData {
 
 export interface Workflow {
     id: number;
-    type: WorkflowType;
-    employee: Employee;
+    requestType: WorkflowType;
+    requestId: string;
     status: WorkflowStatus;
-    workflowData: WorkflowData;
+    initiatedBy: number;
+    assignedTo?: number;
     description: string;
-    createdDate: Date;
-    updatedDate: Date;
+    workflowData?: WorkflowData;
+    employeeId: number;
+    createdAt: Date;
+    updatedAt: Date;
 }

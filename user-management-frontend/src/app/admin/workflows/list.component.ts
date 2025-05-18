@@ -131,7 +131,7 @@ export class ListComponent implements OnInit {
                     // Update the workflow in the local array
                     const index = this.workflows.findIndex(w => w.id === workflow.id);
                     if (index !== -1) {
-                        this.workflows[index].status = newStatus as WorkflowStatus;
+                        this.workflows[index] = response;
                         // Create a new array reference to trigger change detection
                         this.workflows = [...this.workflows];
                     }
