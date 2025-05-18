@@ -24,11 +24,6 @@ app.use('/workflows', require('./workflows/workflow.controller'));
 //swagger docs route
 app.use('/api-docs', require('_helpers/swagger'));
 
-//redirect root to swagger docs
-app.get('/', (req, res) => {
-    res.redirect('/api-docs');
-});
-
 //global error handler
 app.use(errorHandler)
 
