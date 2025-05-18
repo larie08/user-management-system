@@ -67,8 +67,24 @@ async function initialize() {
         db.Workflow.belongsTo(db.Employee, { foreignKey: 'employeeId' });
 
         // sync all models with database
-        await sequelize.sync({ alter: true, force: false });
-        console.log('Database synchronized successfully');
+        try {
+            // First check if tables exist
+            const tables = await sequelize.query('SHOW TABLES');
+            const tableNames = tables[0].map(table => Object.values(table)[0]);
+            
+            if (tableNames.length === 0) {
+                // If no tables exist, create them
+                await sequelize.sync({ force: true });
+                console.log('Database tables created successfully');
+            } else {
+                // If tables exist, only alter them
+                await sequelize.sync({ alter: true });
+                console.log('Database tables altered successfully');
+            }
+        } catch (error) {
+            console.error('Error syncing database:', error);
+            throw error;
+        }
     } catch (error) {
         console.error('Error initializing database:', error);
         throw error;
