@@ -10,17 +10,24 @@ This guide will help you deploy your Node.js + MySQL backend and Angular fronten
 ## Step 1: Deploy Backend to Render.com
 
 1. **Create a GitHub repository**
-   - Push your code to GitHub (if not already done)
-   - Make sure to include all the files we've prepared (Procfile, render.yaml)
+   - Push your entire project (including both frontend and backend) to GitHub
+   - Make sure the render.yaml file is in the root directory of your repository
 
 2. **Sign up for Render.com**
    - Go to https://render.com/ and sign up for a free account
    - Connect your GitHub account
 
-3. **Create a new Web Service**
-   - Click "New" and select "Web Service"
+3. **Deploy using Blueprint (Recommended)**
+   - In Render dashboard, click "New" and select "Blueprint"
    - Connect your GitHub repository
-   - Select the repository containing your backend code
+   - Render will automatically detect the render.yaml file and configure your services
+   - Review the configuration and click "Apply"
+   - Select the free plan
+
+4. **Alternative: Manual Web Service Setup**
+   - If the Blueprint option doesn't work, click "New" and select "Web Service"
+   - Connect your GitHub repository
+   - Important: Set the Root Directory to "user-management-backend"
    - Configure the service:
      - Name: user-management-backend
      - Runtime: Node

@@ -1,19 +1,44 @@
-const config =  require('config.json');
+const config = require('config.json');
 const mysql = require('mysql2/promise');
 const { Sequelize } = require('sequelize');
+require('dotenv').config();
 
 module.exports = db = {};
 
 initialize();
 
 async function initialize() {
+    // Determine if using environment variables or config file
+    const dbConfig = {
+        host: process.env.DATABASE_HOST || config.database.host,
+        port: process.env.DATABASE_PORT || config.database.port,
+        user: process.env.DATABASE_USER || config.database.user,
+        password: process.env.DATABASE_PASSWORD || config.database.password,
+        database: process.env.DATABASE_NAME || config.database.database
+    };
+    
+    console.log('Connecting to database with config:', {
+        host: dbConfig.host,
+        port: dbConfig.port,
+        user: dbConfig.user,
+        database: dbConfig.database
+    });
+    
     //create db if it doesn't already exist
-    const { host, port, user, password, database } = config.database;
-    const connection = await mysql.createConnection({ host, port, user, password });
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
+    const connection = await mysql.createConnection({ 
+        host: dbConfig.host, 
+        port: dbConfig.port, 
+        user: dbConfig.user, 
+        password: dbConfig.password 
+    });
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\`;`);
 
     //connect to db
-    const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
+    const sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, { 
+        dialect: 'mysql',
+        host: dbConfig.host,
+        port: dbConfig.port
+    });
 
     //init models and add them to the exported db project
     db.Account = require('../accounts/account.model')(sequelize);
