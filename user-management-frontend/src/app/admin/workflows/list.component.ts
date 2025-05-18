@@ -125,7 +125,7 @@ export class ListComponent implements OnInit {
 
         this.workflowService.update(workflow.id, updatedWorkflow)
             .subscribe({
-                next: (response) => {
+                next: (response: Workflow) => {
                     console.log('Workflow updated successfully:', response);
                     
                     // Update the workflow in the local array
