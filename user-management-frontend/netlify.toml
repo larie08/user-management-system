@@ -1,7 +1,7 @@
 [build]
   base = "user-management-frontend"
   publish = "dist/user-management-frontend"
-  command = "npm install && ng build --prod"
+  command = "npm install && ng build user-management-frontend --configuration production"
 
 [[redirects]]
   from = "/*"
