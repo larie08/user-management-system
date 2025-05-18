@@ -27,14 +27,14 @@ function model(sequelize) {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'Accounts',
+                model: 'accounts',
                 key: 'id'
             }
         },
         assignedTo: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'Accounts',
+                model: 'accounts',
                 key: 'id'
             }
         },
@@ -49,7 +49,11 @@ function model(sequelize) {
         },
         employeeId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            references: {
+                model: 'employees',
+                key: 'id'
+            }
         },
         createdAt: {
             type: DataTypes.DATE,
@@ -75,5 +79,5 @@ function model(sequelize) {
         }
     };
 
-    return sequelize.define('Workflow', attributes, options);
+    return sequelize.define('workflow', attributes, options);
 }
