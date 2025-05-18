@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --open",
-    "build": "npx ng build && cp static.json dist/user-management-frontend/",
+    "start": "ng serve --configuration production --host 0.0.0.0 --port $PORT",
+    "build": "ng build && cp static.json dist/user-management-frontend/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -21,7 +21,6 @@
     "@angular/platform-browser": "^17.3.2",
     "@angular/platform-browser-dynamic": "^17.3.2",
     "@angular/router": "^17.3.2",
-    "node": "^24.0.1",
     "rxjs": "^6.5.5",
     "tslib": "^2.0.0",
     "zone.js": "^0.14.4"
