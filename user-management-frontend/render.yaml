@@ -6,5 +6,5 @@ services:
   startCommand: npx serve -s dist/user-management-frontend/browser
   envVars:
     - key: NODE_VERSION
-      value: 18.0.0
+      value: 20.11.1
       
