@@ -47,6 +47,10 @@ function model(sequelize) {
             allowNull: true,
             comment: 'Additional data specific to the workflow type (e.g., department transfer details)'
         },
+        employeeId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
         createdAt: {
             type: DataTypes.DATE,
             allowNull: false,

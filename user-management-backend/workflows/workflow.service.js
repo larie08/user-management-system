@@ -48,12 +48,10 @@ async function _delete(id) {
 }
 
 async function getByEmployeeId(employeeId) {
-    // Using Sequelize to find workflows related to an employee
+    // Find workflows related to an employee by employeeId
     return await Workflow.findAll({
         where: {
-            // Using requestId field which should contain the employee ID
-            // This is based on the workflow model structure
-            requestId: employeeId.toString()
+            employeeId: employeeId
         },
         order: [['createdAt', 'DESC']]
     });

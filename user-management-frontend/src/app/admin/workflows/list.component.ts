@@ -156,7 +156,8 @@ export class ListComponent implements OnInit {
     }
     
     getObjectKeys(obj: any): string[] {
-        return Object.keys(obj);
+        // Filter out 'items' key
+        return Object.keys(obj).filter(key => key !== 'items');
     }
 
     goBackToEmployees() {
