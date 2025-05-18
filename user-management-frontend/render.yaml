@@ -1,26 +1,9 @@
 services:
   - type: web
-    name: user-management-backend
+    name: user-management-frontend
     env: node
-    rootDir: user-management-backend
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: npm install && npm run build -- --configuration production
+    startCommand: npx serve -s dist/user-management-frontend
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_HOST
-        value: 153.92.15.31
-      - key: DATABASE_USER
-        value: u875409848_rubi
-      - key: DATABASE_PASSWORD
-        value: 9T2Z5$3UKkgSYzE
-      - key: DATABASE_NAME
-        value: u875409848_rubi
-      - key: DATABASE_PORT
-        value: 3306
-      - key: JWT_SECRET
-        value: z3UG88nutkGpKUbjC6yz/g==
-      - key: PORT
-        value: 10000
-    healthCheckPath: /accounts
-    autoDeploy: true
+      - key: NODE_VERSION
+        value: 18.0.0 

@@ -25,18 +25,11 @@ function model(sequelize) {
         },
         initiatedBy: {
             type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'accounts',
-                key: 'id'
-            }
+            allowNull: false
         },
         assignedTo: {
             type: DataTypes.INTEGER,
-            references: {
-                model: 'accounts',
-                key: 'id'
-            }
+            allowNull: true
         },
         description: { 
             type: DataTypes.TEXT, 
@@ -49,11 +42,7 @@ function model(sequelize) {
         },
         employeeId: {
             type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'Employees',
-                key: 'id'
-            }
+            allowNull: false
         },
         createdAt: {
             type: DataTypes.DATE,
