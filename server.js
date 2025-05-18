@@ -19,6 +19,7 @@ app.use('/accounts', require('./accounts/accounts.controller'));
 app.use('/departments', require('./departments/departments.controller'));
 app.use('/employees', require('./employees/index'));
 app.use('/requests', require('./requests/index'));
+app.use('/workflows', require('./workflows/workflow.controller'));
 
 //swagger docs route
 app.use('/api-docs', require('_helpers/swagger'));

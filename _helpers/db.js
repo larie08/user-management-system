@@ -19,6 +19,7 @@ async function initialize() {
     db.Account = require('../accounts/account.model')(sequelize);
     db.RefreshToken = require('../accounts/refresh-token.model')(sequelize);
     db.Department = require('../departments/department.model')(sequelize);
+    db.Workflow = require('../workflows/workflow.model')(sequelize);
     db.Employee = require('../employees/employee.model')(sequelize);
 
     // Request and RequestItem models
@@ -37,6 +38,16 @@ async function initialize() {
     // Department-Employee relationship
     db.Department.hasMany(db.Employee, { foreignKey: 'departmentId', onDelete: 'SET NULL' });
     db.Employee.belongsTo(db.Department, { foreignKey: 'departmentId' });
+
+    // Workflow relationships
+    db.Account.hasMany(db.Workflow, { foreignKey: 'initiatedBy', as: 'initiator' });
+    db.Workflow.belongsTo(db.Account, { foreignKey: 'initiatedBy', as: 'initiator' });
+    db.Account.hasMany(db.Workflow, { foreignKey: 'assignedTo', as: 'assignee' });
+    db.Workflow.belongsTo(db.Account, { foreignKey: 'assignedTo', as: 'assignee' });
+    
+    // Employee-Workflow relationship
+    db.Employee.hasMany(db.Workflow, { foreignKey: 'employeeId' });
+    db.Workflow.belongsTo(db.Employee, { foreignKey: 'employeeId' });
 
     // sync all models with database
     await sequelize.sync({ alter: true });
