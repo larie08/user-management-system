@@ -27,15 +27,13 @@
             "inlineStyleLanguage": "less",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              "src/_redirects",
-              "src/web.config"
+              "src/assets"
             ],
             "styles": [
               "src/styles.less"
             ],
-            "scripts": [],
-            "baseHref": "/"
+            "scripts": []
+            
           },
           "configurations": {
             "production": {
@@ -51,8 +49,7 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all",
-              "baseHref": "/"
+              "outputHashing": "all"
             },
             "development": {
               "optimization": false,
